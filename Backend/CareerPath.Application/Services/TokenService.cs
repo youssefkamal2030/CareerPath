@@ -19,25 +19,40 @@ namespace CareerPath.Application.Services
 
         public TokenService(IConfiguration configuration)
         {
-
             _secretKey = configuration["Jwt:SecretKey"];
             _issuer = configuration["Jwt:Issuer"];
             _audience = configuration["Jwt:Audience"];
         }
+        
+        // Helper method to get the key as a byte array, properly handling base64 encoding
+        private byte[] GetSecretKeyBytes()
+        {
+            // First try to decode the key as base64
+            try
+            {
+                return Convert.FromBase64String(_secretKey);
+            }
+            catch (FormatException)
+            {
+                // If it's not a valid base64 string, encode it to base64 first, then decode
+                string base64Secret = Convert.ToBase64String(Encoding.UTF8.GetBytes(_secretKey));
+                return Convert.FromBase64String(base64Secret);
+            }
+        }
+        
         public string GenerateToken(ApplicationUser user)
         {
             var tokenHandler = new JwtSecurityTokenHandler();
-            var key = Encoding.ASCII.GetBytes(_secretKey);
+            var key = GetSecretKeyBytes();
 
             var tokenDescriptor = new SecurityTokenDescriptor
             {
                 Subject = new ClaimsIdentity(new[]
                 {
-                new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
-                new Claim(ClaimTypes.Name, user.UserName),
-                new Claim(ClaimTypes.Email, user.Email)
-                
-            }),
+                    new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
+                    new Claim(ClaimTypes.Name, user.UserName),
+                    new Claim(ClaimTypes.Email, user.Email)
+                }),
                 Expires = DateTime.UtcNow.AddHours(1), 
                 Issuer = _issuer,
                 Audience = _audience,
@@ -53,7 +68,7 @@ namespace CareerPath.Application.Services
         public ClaimsPrincipal ValidateToken(string token)
         {
             var tokenHandler = new JwtSecurityTokenHandler();
-            var key = Encoding.ASCII.GetBytes(_secretKey);
+            var key = GetSecretKeyBytes();
 
             try
             {
@@ -65,7 +80,8 @@ namespace CareerPath.Application.Services
                     ValidIssuer = _issuer,
                     ValidateAudience = true,
                     ValidAudience = _audience,
-                    ValidateLifetime = true 
+                    ValidateLifetime = true,
+                    ClockSkew = TimeSpan.Zero // Reduce the default 5-minute clock skew to zero
                 }, out var validatedToken);
 
                 return principal;

@@ -12,5 +12,7 @@ namespace CareerPath.Application.Interfaces
     {
         Task<(bool success, string? errorMessage)> RegisterUserAsync(RegisterDto user);
         Task<(string? token, string? errorMessage)> LoginUserAsync(LoginDto user);
+        Task<(bool success, string? errorMessage)> ForgotPasswordAsync(ForgotPasswordDto forgotPasswordDto);
+        Task<(bool success, string? errorMessage)> ResetPasswordAsync(ResetPasswordDto resetPasswordDto);
     }
 }
