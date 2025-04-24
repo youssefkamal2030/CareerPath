@@ -75,5 +75,10 @@ namespace CareerPath.Api.Controllers
                 return BadRequest(new { Error = errorMessage });
             }
         }
+        [HttpGet("hello")]
+        public IActionResult hello()
+        {
+            return Ok("API IS WORKING ");
+        }
     }
 }

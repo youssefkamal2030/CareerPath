@@ -63,7 +63,7 @@ namespace CareerPath.Application.Services
 
                 var token = _jwtTokenService.GenerateToken(existingUser);
                 return (token, null);
-            }
+        }
             catch (SqlException ex)
             {
                 Console.WriteLine($"SQL Error in LoginUserAsync: {ex.Message}");

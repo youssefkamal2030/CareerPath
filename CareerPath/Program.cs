@@ -20,7 +20,7 @@ namespace CareerPath
             var builder = WebApplication.CreateBuilder(args);
 
             builder.Services.AddDbContext<ApplicationDbContext>(options =>
-                options.UseSqlServer(builder.Configuration.GetConnectionString("localConnection"), 
+                options.UseSqlServer(builder.Configuration.GetConnectionString("MonsterAPI"), 
                 sqlServerOptionsAction: sqlOptions => 
                 {
                     sqlOptions.EnableRetryOnFailure(
@@ -80,7 +80,7 @@ namespace CareerPath
                               .AllowAnyHeader();
                     });
             });
-            // Add AutoMapper
+            // AutoMapper
             builder.Services.AddAutoMapper(typeof(UserProfileMapping).Assembly);
 
             builder.Services.AddEndpointsApiExplorer();
@@ -93,7 +93,7 @@ namespace CareerPath
                     Description = "REST API for the CareerPath application"
                 });
                 
-                // Define the JWT Bearer authentication scheme
+                // JWT Bearer authentication scheme
                 options.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
                 {
                     Description = "JWT Authorization header using the Bearer scheme. Enter 'Bearer' [space] and then your token in the text input below. Example: 'Bearer 12345abcdef'",
@@ -126,7 +126,7 @@ namespace CareerPath
             builder.Services.AddScoped<ITokenService, TokenService>();
             builder.Services.AddScoped<IAuthService, AuthService>();
 
-            // Register UserProfile services
+            //  UserProfile services
             builder.Services.AddScoped<IUserProfileRepository, UserProfileRepository>();
             builder.Services.AddScoped<IUserProfileService, UserProfileService>();
             builder.Services.AddScoped<IEmailService, SmtpEmailService>();
@@ -148,12 +148,12 @@ namespace CareerPath
                 app.UseHsts();
             }
 
-            // Configure the HTTP request pipeline.
+            //   HTTP request pipeline.
             app.UseHttpsRedirection();
 
             app.UseCors("AllowAll");
             
-            // Add authentication middleware before authorization
+            //  authentication middleware before authorization
             app.UseAuthentication();
             app.UseAuthorization();
 
@@ -164,14 +164,14 @@ namespace CareerPath
 
         private static byte[] GetSecretKeyBytes(string secretKey)
         {
-            // First try to decode the key as base64
+           
             try
             {
                 return Convert.FromBase64String(secretKey);
             }
             catch (FormatException)
             {
-                // If it's not a valid base64 string, encode it to base64 first, then decode
+              
                 string base64Secret = Convert.ToBase64String(Encoding.UTF8.GetBytes(secretKey));
                 return Convert.FromBase64String(base64Secret);
             }
