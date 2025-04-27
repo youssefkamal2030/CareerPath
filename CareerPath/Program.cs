@@ -20,14 +20,7 @@ namespace CareerPath
             var builder = WebApplication.CreateBuilder(args);
 
             builder.Services.AddDbContext<ApplicationDbContext>(options =>
-                options.UseSqlServer(builder.Configuration.GetConnectionString("MonsterAPI"), 
-                sqlServerOptionsAction: sqlOptions => 
-                {
-                    sqlOptions.EnableRetryOnFailure(
-                        maxRetryCount: 5,
-                        maxRetryDelay: TimeSpan.FromSeconds(30),
-                        errorNumbersToAdd: null);
-                }));
+                options.UseSqlite(builder.Configuration.GetConnectionString("SqliteConnection")));
             // Add Identity Services
             builder.Services.AddDefaultIdentity<ApplicationUser>(options =>
             {
@@ -148,8 +141,8 @@ namespace CareerPath
                 app.UseHsts();
             }
 
-            //   HTTP request pipeline.
-            app.UseHttpsRedirection();
+          
+     
 
             app.UseCors("AllowAll");
             
@@ -158,6 +151,13 @@ namespace CareerPath
             app.UseAuthorization();
 
             app.MapControllers();
+
+            // Ensure the SQLite database is created
+            using (var scope = app.Services.CreateScope())
+            {
+                var dbContext = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+                dbContext.Database.EnsureCreated();
+            }
 
             app.Run();
         }
