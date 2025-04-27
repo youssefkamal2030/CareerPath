@@ -1,7 +1,7 @@
 # CareerPath API Documentation
 
 ## Base URL
-`https://careerpath.runasp.net`
+`{Base_url} = https://careerpath.runasp.net` 
 
 ## Table of Contents
 - [Authentication Endpoints](#authentication-endpoints)
@@ -13,8 +13,9 @@ Base path: `/auth`
 
 ### Register User
 - **Endpoint:** `POST /auth/register`
-- **URL:** `/auth/register`
+- **URL:** `{Base_url}/auth/register`
 - **Description:** Creates a new user account
+- **Authentication:** Not required
 - **Request Body:**
 ```json
 {
@@ -38,8 +39,9 @@ Base path: `/auth`
 
 ### Login
 - **Endpoint:** `POST /auth/login`
-- **URL:** `https://careerpath.runasp.net/auth/login`
+- **URL:** `{Base_url}/auth/login`
 - **Description:** Authenticates a user and returns a JWT token
+- **Authentication:** Not required
 - **Request Body:**
 ```json
 {
@@ -62,8 +64,9 @@ Base path: `/auth`
 
 ### Forgot Password
 - **Endpoint:** `POST /auth/forgot-password`
-- **URL:** `http://careerpath.runasp.net/auth/forgot-password`
+- **URL:** `{Base_url}/auth/forgot-password`
 - **Description:** Initiates the password reset process by sending a reset link to the user's email
+- **Authentication:** Not required
 - **Request Body:**
 ```json
 {
@@ -85,8 +88,9 @@ Base path: `/auth`
 
 ### Reset Password
 - **Endpoint:** `POST /auth/reset-password`
-- **URL:** `http://careerpath.runasp.net/auth/reset-password`
+- **URL:** `{Base_url}/auth/reset-password`
 - **Description:** Resets the user's password using the token received via email
+- **Authentication:** Not required
 - **Request Body:**
 ```json
 {
@@ -117,9 +121,9 @@ Base path: `/api/profiles`
 
 ### Get All Profiles
 - **Endpoint:** `GET /api/profiles`
-- **URL:** `http://careerpath.runasp.net/api/profiles`
+- **URL:** `{Base_url}/api/profiles`
 - **Description:** Retrieves all user profiles
-- **Authentication:** Required
+- **Authentication:** Required (JWT token)
 - **Success Response (200 OK):**
 ```json
 [
@@ -145,9 +149,9 @@ Base path: `/api/profiles`
 
 ### Get Profile by ID
 - **Endpoint:** `GET /api/profiles/{id}`
-- **URL:** `http://careerpath.runasp.net/api/profiles/{id}`
+- **URL:** `{Base_url}/api/profiles/{id}`
 - **Description:** Retrieves a specific user profile by ID
-- **Authentication:** Required
+- **Authentication:** Required (JWT token)
 - **Parameters:** 
   - `id` (path parameter): The ID of the user profile
 - **Success Response (200 OK):**
@@ -175,9 +179,9 @@ Base path: `/api/profiles`
 
 ### Get My Profile
 - **Endpoint:** `GET /api/profiles/me`
-- **URL:** `http://careerpath.runasp.net/api/profiles/me`
+- **URL:** `{Base_url}/api/profiles/me`
 - **Description:** Retrieves the profile of the currently authenticated user
-- **Authentication:** Required
+- **Authentication:** Required (JWT token)
 - **Success Response (200 OK):**
 ```json
 {
@@ -198,9 +202,9 @@ Base path: `/api/profiles`
 
 ### Create Profile
 - **Endpoint:** `POST /api/profiles`
-- **URL:** `http://careerpath.runasp.net/api/profiles`
+- **URL:** `{Base_url}/api/profiles`
 - **Description:** Creates a new profile for the authenticated user
-- **Authentication:** Required
+- **Authentication:** Required (JWT token)
 - **Request Body:**
 ```json
 {
@@ -235,9 +239,9 @@ Base path: `/api/profiles`
 
 ### Update Profile
 - **Endpoint:** `PUT /api/profiles/{id}`
-- **URL:** `http://careerpath.runasp.net/api/profiles/{id}`
+- **URL:** `{Base_url}/api/profiles/{id}`
 - **Description:** Updates an existing user profile
-- **Authentication:** Required
+- **Authentication:** Required (JWT token)
 - **Parameters:**
   - `id` (path parameter): The ID of the profile to update (must be the authenticated user's profile)
 - **Request Body:**
@@ -274,9 +278,9 @@ Base path: `/api/profiles`
 
 ### Delete Profile
 - **Endpoint:** `DELETE /api/profiles/{id}`
-- **URL:** `http://careerpath.runasp.net/api/profiles/{id}`
+- **URL:** `{Base_url}/api/profiles/{id}`
 - **Description:** Deletes a user profile
-- **Authentication:** Required
+- **Authentication:** Required (JWT token)
 - **Parameters:**
   - `id` (path parameter): The ID of the profile to delete (must be the authenticated user's profile)
 - **Success Response (204 No Content)**
