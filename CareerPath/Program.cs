@@ -20,7 +20,18 @@ namespace CareerPath
             var builder = WebApplication.CreateBuilder(args);
 
             builder.Services.AddDbContext<ApplicationDbContext>(options =>
-                options.UseSqlite(builder.Configuration.GetConnectionString("SqliteConnection")));
+                options.UseSqlServer(builder.Configuration.GetConnectionString("localConnection"),
+                sqlServerOptionsAction: sqlOptions => 
+                {
+                    sqlOptions.EnableRetryOnFailure(
+                        maxRetryCount: 5,
+                        maxRetryDelay: TimeSpan.FromSeconds(30),
+                        errorNumbersToAdd: null);
+                }));
+            // SQLite configuration (commented out)
+            // builder.Services.AddDbContext<ApplicationDbContext>(options =>
+            //     options.UseSqlite(builder.Configuration.GetConnectionString("SqliteConnection")));
+            
             // Add Identity Services
             builder.Services.AddDefaultIdentity<ApplicationUser>(options =>
             {
@@ -146,18 +157,11 @@ namespace CareerPath
 
             app.UseCors("AllowAll");
             
-            //  authentication middleware before authorization
+            //  authentication middleware
             app.UseAuthentication();
             app.UseAuthorization();
 
             app.MapControllers();
-
-            // Ensure the SQLite database is created
-            using (var scope = app.Services.CreateScope())
-            {
-                var dbContext = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
-                dbContext.Database.EnsureCreated();
-            }
 
             app.Run();
         }
