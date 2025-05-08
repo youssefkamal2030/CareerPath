@@ -10,6 +10,8 @@ using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 using System.Web;
 using CareerPath.Domain.Entities;
+using EmailConfigration.EmailConfig;
+using Microsoft.Extensions.Logging;
 
 namespace CareerPath.Application.Services
 {
@@ -18,20 +20,23 @@ namespace CareerPath.Application.Services
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly SignInManager<ApplicationUser> _signInManager;
         private readonly ITokenService _jwtTokenService;
-        private readonly IEmailService _emailService;
+        private readonly EmailSender _emailSender;
+        private readonly ILogger<AuthService> _logger;
         private readonly IUserProfileRepository _userProfileRepository;
 
         public AuthService(
             UserManager<ApplicationUser> userManager, 
             SignInManager<ApplicationUser> signInManager, 
             ITokenService tokenService,
-            IEmailService emailService,
+            EmailSender emailSender,
+            ILogger<AuthService> logger,
             IUserProfileRepository userProfileRepository)
         {
             _userManager = userManager;
             _signInManager = signInManager;
             _jwtTokenService = tokenService;
-            _emailService = emailService;
+            _emailSender = emailSender;
+            _logger = logger;
             _userProfileRepository = userProfileRepository;
         }
 
@@ -168,60 +173,80 @@ namespace CareerPath.Application.Services
         {
             try
             {
-                var user = await _userManager.FindByEmailAsync(forgotPasswordDto.Email);
+                if (string.IsNullOrEmpty(forgotPasswordDto.Email))
+                {
+                    return (false, "Email is required");
+                }
+
+                // Normalize the email for consistent lookup
+                var email = forgotPasswordDto.Email.NormalizeEmail();
+                
+                if (!email.IsValidEmail())
+                {
+                    return (false, "Invalid email format");
+                }
+
+                var user = await _userManager.FindByEmailAsync(email);
+                
+                // Always return success for security reasons (don't reveal if email exists)
                 if (user == null)
                 {
-                    return (true, null); //always return true for security
+                    _logger.LogInformation("Password reset requested for non-existent email: {Email}", email);
+                    return (true, null);
                 }
 
                 var token = await _userManager.GeneratePasswordResetTokenAsync(user);
-                
                 var encodedToken = HttpUtility.UrlEncode(token);
                 
-                var resetLink = $"https://yourapp.com/reset-password?email={HttpUtility.UrlEncode(user.Email)}&token={encodedToken}";
+                // Build the reset URL - update this with your actual frontend URL
+                var resetLink = $"https://careerpath.com/reset-password?email={HttpUtility.UrlEncode(user.Email)}&token={encodedToken}";
                 
                 var subject = "Reset Your CareerPath Password";
-                var body = $@"
+                var content = $@"
                 <html>
                 <head>
                     <style>
                         body {{ font-family: Arial, sans-serif; line-height: 1.6; color: #333; }}
                         .container {{ max-width: 600px; margin: 0 auto; padding: 20px; }}
-                        .header {{ background-color: #4CAF50; color: white; padding: 10px; text-align: center; }}
-                        .content {{ padding: 20px; }}
-                        .button {{ display: inline-block; background-color: #4CAF50; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px; }}
-                        .footer {{ font-size: 12px; color: #777; margin-top: 30px; }}
+                        .header {{ background-color: #4A6FFF; color: white; padding: 15px; text-align: center; border-radius: 5px 5px 0 0; }}
+                        .content {{ padding: 20px; background-color: #f9f9f9; border-left: 1px solid #ddd; border-right: 1px solid #ddd; }}
+                        .button {{ display: inline-block; background-color: #4A6FFF; color: white; padding: 12px 24px; text-decoration: none; border-radius: 4px; font-weight: bold; margin: 20px 0; }}
+                        .footer {{ font-size: 12px; color: #777; margin-top: 30px; text-align: center; padding: 15px; background-color: #f1f1f1; border-radius: 0 0 5px 5px; }}
+                        .warning {{ color: #e74c3c; font-size: 13px; }}
                     </style>
                 </head>
                 <body>
                     <div class='container'>
                         <div class='header'>
-                            <h1>Password Reset Request</h1>
+                            <h1>Password Reset</h1>
                         </div>
                         <div class='content'>
-                            <p>Hi {user.UserName},</p>
-                            <p>We received a request to reset your password. Click the button below to create a new password:</p>
-                            <p><a href='{resetLink}' class='button'>Reset Password</a></p>
+                            <p>Hello {user.UserName},</p>
+                            <p>We received a request to reset your password for your CareerPath account. To complete the process, please click the button below:</p>
+                            <p style='text-align: center;'><a href='{resetLink}' class='button'>Reset My Password</a></p>
                             <p>If the button doesn't work, you can also copy and paste this link into your browser:</p>
-                            <p>{resetLink}</p>
-                            <p>This link will expire in 24 hours.</p>
-                            <p>If you didn't request a password reset, you can ignore this email.</p>
+                            <p style='word-break: break-all; background-color: #f1f1f1; padding: 10px; border-radius: 4px;'>{resetLink}</p>
+                            <p class='warning'><strong>Important:</strong> This link will expire in 24 hours for security reasons.</p>
+                            <p>If you didn't request a password reset, please ignore this email or contact support if you have concerns about your account security.</p>
+                            <p>Thank you,<br>The CareerPath Team</p>
                         </div>
                         <div class='footer'>
                             <p>© {DateTime.Now.Year} CareerPath. All rights reserved.</p>
+                            <p>This is an automated message, please do not reply.</p>
                         </div>
                     </div>
                 </body>
                 </html>";
 
-                // Send email with the reset link
-                await _emailService.SendEmailAsync(user.Email, subject, body);
+                // Send email using our EmailSender
+                await _emailSender.SendEmailAsync(user.Email, subject, content);
                 
+                _logger.LogInformation("Password reset email sent to: {Email}", email);
                 return (true, null);
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Error in ForgotPasswordAsync: {ex.Message}");
+                _logger.LogError(ex, "Error in ForgotPasswordAsync: {ErrorMessage}", ex.Message);
                 return (false, "Failed to process your request. Please try again later.");
             }
         }
@@ -230,10 +255,29 @@ namespace CareerPath.Application.Services
         {
             try
             {
-                var user = await _userManager.FindByEmailAsync(resetPasswordDto.Email);
+                if (string.IsNullOrEmpty(resetPasswordDto.Email))
+                {
+                    return (false, "Email is required");
+                }
+
+                if (string.IsNullOrEmpty(resetPasswordDto.Token))
+                {
+                    return (false, "Reset token is required");
+                }
+
+                if (string.IsNullOrEmpty(resetPasswordDto.NewPassword))
+                {
+                    return (false, "New password is required");
+                }
+
+                // Normalize the email for consistent lookup
+                var email = resetPasswordDto.Email.NormalizeEmail();
+
+                var user = await _userManager.FindByEmailAsync(email);
                 if (user == null)
                 {
-                    return (false, "Invalid request.");
+                    _logger.LogWarning("Password reset attempted for non-existent email: {Email}", email);
+                    return (false, "Invalid request");
                 }
 
                 // Reset the password
@@ -246,15 +290,63 @@ namespace CareerPath.Application.Services
                 if (!result.Succeeded)
                 {
                     var errors = string.Join(", ", result.Errors.Select(e => e.Description));
+                    _logger.LogWarning("Password reset failed for {Email}: {Errors}", email, errors);
                     return (false, errors);
+                }
+
+                // Send a confirmation email that password was changed
+                try
+                {
+                    var subject = "Your CareerPath Password Has Been Reset";
+                    var content = $@"
+                    <html>
+                    <head>
+                        <style>
+                            body {{ font-family: Arial, sans-serif; line-height: 1.6; color: #333; }}
+                            .container {{ max-width: 600px; margin: 0 auto; padding: 20px; }}
+                            .header {{ background-color: #4A6FFF; color: white; padding: 15px; text-align: center; border-radius: 5px 5px 0 0; }}
+                            .content {{ padding: 20px; background-color: #f9f9f9; border-left: 1px solid #ddd; border-right: 1px solid #ddd; }}
+                            .button {{ display: inline-block; background-color: #4A6FFF; color: white; padding: 12px 24px; text-decoration: none; border-radius: 4px; font-weight: bold; margin: 20px 0; }}
+                            .footer {{ font-size: 12px; color: #777; margin-top: 30px; text-align: center; padding: 15px; background-color: #f1f1f1; border-radius: 0 0 5px 5px; }}
+                            .alert {{ color: #e74c3c; }}
+                        </style>
+                    </head>
+                    <body>
+                        <div class='container'>
+                            <div class='header'>
+                                <h1>Password Reset Successful</h1>
+                            </div>
+                            <div class='content'>
+                                <p>Hello {user.UserName},</p>
+                                <p>Your password for CareerPath has been successfully reset.</p>
+                                <p>You can now log in with your new password.</p>
+                                <p style='text-align: center;'><a href='https://careerpath.com/login' class='button'>Log In Now</a></p>
+                                <p class='alert'><strong>Important:</strong> If you did not request this password change, please contact our support team immediately.</p>
+                                <p>Thank you,<br>The CareerPath Team</p>
+                            </div>
+                            <div class='footer'>
+                                <p>© {DateTime.Now.Year} CareerPath. All rights reserved.</p>
+                                <p>This is an automated message, please do not reply.</p>
+                            </div>
+                        </div>
+                    </body>
+                    </html>";
+
+                    await _emailSender.SendEmailAsync(user.Email, subject, content);
+                    _logger.LogInformation("Password reset confirmation email sent to: {Email}", email);
+                }
+                catch (Exception ex)
+                {
+                    // Log but don't fail the password reset if confirmation email fails
+                    _logger.LogError(ex, "Failed to send password reset confirmation email to {Email}", email);
                 }
 
                 return (true, null);
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Error in ResetPasswordAsync: {ex.Message}");
-                return (false, "Failed to reset password. Please try again later.");
+                _logger.LogError(ex, "Error in ResetPasswordAsync: {ErrorMessage}", ex.Message);
+                return (false, "Failed to process your request. Please try again later.");
             }
         }
     }

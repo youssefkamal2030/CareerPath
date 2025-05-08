@@ -1,12 +1,13 @@
 using CareerPath.Application.Interfaces;
 using CareerPath.Domain.Entities;
+using CareerPath.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace CareerPath.Infrastructure.Data
+namespace CareerPath.Infrastructure.Repository
 {
     public class UserProfileRepository : IUserProfileRepository
     {
@@ -57,4 +58,4 @@ namespace CareerPath.Infrastructure.Data
             return await _context.UserProfiles.AnyAsync(e => e.Id == id);
         }
     }
-} 
+}

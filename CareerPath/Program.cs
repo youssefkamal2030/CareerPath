@@ -1,15 +1,21 @@
+using System;
+using System.Collections.Generic;
 using CareerPath.Application.Interfaces;
+using CareerPath.Application.Profiles;
 using CareerPath.Application.Services;
 using CareerPath.Domain.Entities;
 using CareerPath.Infrastructure.Data;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
-using CareerPath.Application.Profiles;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using Microsoft.OpenApi.Models;
 using System.Reflection;
+using CareerPath.Infrastructure.Repository;
+using EmailConfigration.EmailConfig;
+using CareerPath.Application.AIDataAnalysis_Interfaces;
+using CareerPath.Application.Configuration;
 
 namespace CareerPath
 {
@@ -28,11 +34,21 @@ namespace CareerPath
                         maxRetryDelay: TimeSpan.FromSeconds(30),
                         errorNumbersToAdd: null);
                 }));
+                
+            builder.Services.AddDbContext<AIDataAnalysisDbContext>(options =>
+                options.UseSqlServer(builder.Configuration.GetConnectionString("AIDataAnalysisConnection"),
+                sqlServerOptionsAction: sqlOptions => 
+                {
+                    sqlOptions.EnableRetryOnFailure(
+                        maxRetryCount: 5,
+                        maxRetryDelay: TimeSpan.FromSeconds(30),
+                        errorNumbersToAdd: null);
+                }));
+                
             // SQLite configuration (commented out)
             // builder.Services.AddDbContext<ApplicationDbContext>(options =>
             //     options.UseSqlite(builder.Configuration.GetConnectionString("SqliteConnection")));
             
-            // Add Identity Services
             builder.Services.AddDefaultIdentity<ApplicationUser>(options =>
             {
                 options.Password.RequireDigit = true;
@@ -46,7 +62,7 @@ namespace CareerPath
             .AddRoles<IdentityRole>()
             .AddEntityFrameworkStores<ApplicationDbContext>()
             .AddDefaultTokenProviders();
-            // Configure JWT Authentication
+            //  JWT Authentication
             var jwtSettings = builder.Configuration.GetSection("Jwt");
             var secretKey = jwtSettings["SecretKey"];
             var key = GetSecretKeyBytes(secretKey);
@@ -86,6 +102,25 @@ namespace CareerPath
             });
             // AutoMapper
             builder.Services.AddAutoMapper(typeof(UserProfileMapping).Assembly);
+            // Email Config 
+            var emailConfig = new EmailConfigration.EmailConfig.EmailConfigration();
+            builder.Configuration.GetSection("EmailSettings").Bind(emailConfig);
+            builder.Services.AddSingleton(emailConfig);
+
+            // External Services Configuration
+            builder.Services.Configure<ExternalServicesSettings>(
+                builder.Configuration.GetSection("ExternalServices"));
+
+            // Register HttpClient for AI Team API
+            builder.Services.AddHttpClient("AITeamClient", (serviceProvider, client) =>
+            {
+                var settings = builder.Configuration
+                    .GetSection("ExternalServices:AITeamApi")
+                    .Get<AITeamApiSettings>();
+                    
+                client.BaseAddress = new Uri(settings.BaseUrl);
+                client.DefaultRequestHeaders.Add("Accept", "application/json");
+            });
 
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen(options =>
@@ -134,6 +169,14 @@ namespace CareerPath
             builder.Services.AddScoped<IUserProfileRepository, UserProfileRepository>();
             builder.Services.AddScoped<IUserProfileService, UserProfileService>();
             builder.Services.AddScoped<IEmailService, SmtpEmailService>();
+            builder.Services.AddScoped<EmailSender>();
+
+            //  AI Data Analysis services
+            builder.Services.AddScoped<IJobsRepository, JobRepository>();
+            builder.Services.AddScoped<IJobsService, JobsService>();
+            builder.Services.AddScoped<JobNotificationService>();
+            builder.Services.AddScoped<ICVAnalysisRepository, CVAnalysisRepository>();
+            builder.Services.AddScoped<ICVAnalysisService, CVAnalysisService>();
 
             var app = builder.Build();
             if(app.Environment.IsDevelopment())
