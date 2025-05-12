@@ -16,6 +16,7 @@ namespace CareerPath.Domain.Entities
         public string? Bio { get; private set; }
         public string? Location { get; private set; }
         public string? CoverUrl { get; private set; }
+        public string? Experiences { get; private set; } = string.Empty;
         public List<string> Skills { get; private set; } = new List<string>();
 
         public string? AvatarUrl { get; private set; }
@@ -23,7 +24,6 @@ namespace CareerPath.Domain.Entities
         public DateTime CreatedAt { get; private set; } = DateTime.UtcNow;
         public DateTime UpdatedAt { get; private set; } = DateTime.UtcNow;
 
-        // Constructor for complete profile
         public UserProfile(string id, string firstName, string lastName, string avatarUrl, string username = null, string email = null)
         {
             Id = id;
@@ -34,15 +34,14 @@ namespace CareerPath.Domain.Entities
             Email = email;
         }
 
-        // Constructor for minimal profile created during registration
         public UserProfile(string id, string username, string email)
         {
             Id = id;
             Username = username;
             Email = email;
-            FirstName = username; // Default to username as a placeholder
+            FirstName = username; 
             LastName = string.Empty;
-            AvatarUrl = string.Empty; // Default empty avatar
+            AvatarUrl = string.Empty; 
         }
 
         public string FullName => $"{FirstName} {LastName}";

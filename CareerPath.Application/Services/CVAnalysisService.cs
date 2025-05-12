@@ -6,6 +6,7 @@ using System.Net.Http.Json;
 using System.Text.Json;
 using Microsoft.Extensions.Options;
 using CareerPath.Application.Configuration;
+using Microsoft.Extensions.Logging;
 
 namespace CareerPath.Application.Services
 {
@@ -20,13 +21,11 @@ namespace CareerPath.Application.Services
         public CVAnalysisService(
             ICVAnalysisRepository repository,
             IMapper mapper,
-            IHttpClientFactory httpClientFactory,
             ILogger<CVAnalysisService> logger,
             IOptions<ExternalServicesSettings> externalServicesSettings)
         {
             _repository = repository;
             _mapper = mapper;
-            _httpClient = httpClientFactory.CreateClient("AITeamClient");
             _logger = logger;
             _aiTeamApiSettings = externalServicesSettings.Value.AITeamApi;
         }

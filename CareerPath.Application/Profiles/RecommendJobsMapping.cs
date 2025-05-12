@@ -18,14 +18,11 @@ namespace CareerPath.Application.Profiles
                 .ForMember(dest => dest.Title, opt => opt.MapFrom(src => src.JobTitle))
                 .ForMember(dest => dest.Company, opt => opt.MapFrom(src => src.Company))
                 .ForMember(dest => dest.Description, opt => opt.MapFrom(src => src.JobDescription))
-                .ForMember(dest => dest.StartDate, opt => opt.MapFrom(src => 
-                    src.StartYear.HasValue && src.StartMonth.HasValue ? 
-                    new DateTime(src.StartYear.Value, src.StartMonth.Value, 1) : 
-                    DateTime.MinValue))
-                .ForMember(dest => dest.EndDate, opt => opt.MapFrom(src => 
-                    src.EndYear.HasValue && src.EndMonth.HasValue ? 
-                    new DateTime(src.EndYear.Value, src.EndMonth.Value, 1) : 
-                    null));
+                .ForMember(dest => dest.StartDate, opt => opt.MapFrom(src =>
+                    src.StartYear.HasValue && src.StartMonth.HasValue ?
+                    new DateTime(src.StartYear.Value, src.StartMonth.Value, 1) :
+                    DateTime.MinValue));
+               
 
             // Map from ProjectDto to Project
             CreateMap<ProjectDto, Project>()
