@@ -560,6 +560,9 @@ coverage/
 
 ### Additional Ignores for Large/Sensitive Files ###
 
+# Executable directory - contains binaries and config files
+/Excutable/
+
 # Database files
 *.bacpac
 *.bak
