@@ -557,3 +557,107 @@ coverage/
 
 # Optional: TypeScript
 *.tsbuildinfo
+
+### Additional Ignores for Large/Sensitive Files ###
+
+# Database files
+*.bacpac
+*.bak
+*.dacpac
+
+# Large media files
+*.mp4
+*.mov
+*.wmv
+*.avi
+*.mkv
+*.flv
+*.webm
+*.zip
+*.tar.gz
+*.7z
+*.rar
+
+# ML model files
+*.h5
+*.pkl
+*.model
+*.weights
+*.pt
+*.joblib
+*.tfmodel
+*.onnx
+
+# Large data files
+*.csv
+*.json
+*.xml
+*.parquet
+*.avro
+*.arrow
+*.feather
+*.xlsx
+*.xls
+*.pptx
+*.docx
+# (uncomment if you don't want these in repository)
+# *.pdf
+
+# AI/ML dataset files
+**/datasets/
+**/data/raw/
+**/data/processed/
+**/models/pretrained/
+
+# Secrets and credentials
+appsettings.*.json
+!appsettings.example.json
+**/Properties/launchSettings.json
+**/*secrets*.*
+**/*credentials*.*
+**/*Secret*.*
+**/*Credential*.*
+**/*Password*.*
+**/*ApiKey*.*
+**/*ConnectionString*.*
+**/*.pfx
+**/*.key
+**/*.pem
+ServiceAccount*.json
+
+# ASP.NET Core User Secrets
+**/secrets.json
+
+# Temporary files
+[Tt]emp/
+*.temp
+*.tmp
+
+# Excutable files
+*.exe
+
+# Logs and diagnostics
+**/logs/
+**/Log/
+**/*.log
+**/*.stackdump
+
+# VS and Cache Files (additional)
+*.cache
+*.dll.refresh
+.sass-cache/
+**/_site/
+**/*.orig
+**/*.rej
+**/StyleCop.Cache
+
+# SQLite
+*.sqlite
+*.sqlite3
+*.db
+*.db3
+
+# Local Configuration
+**/appsettings.Development.json
+**/appsettings.local.json
+**/config.local.json
