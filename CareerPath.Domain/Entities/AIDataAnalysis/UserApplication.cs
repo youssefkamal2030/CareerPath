@@ -1,6 +1,7 @@
 using System;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Text.Json.Serialization;
 
 namespace CareerPath.Domain.Entities.AIDataAnalysis
 {
@@ -20,9 +21,17 @@ namespace CareerPath.Domain.Entities.AIDataAnalysis
         public DateTime? FollowUpReminder { get; set; }
         
         [ForeignKey("CandidateId")]
+        [JsonIgnore]
         public virtual Candidate Candidate { get; set; }
         
         [ForeignKey("JobId")]
+        [JsonIgnore]
         public virtual Job Job { get; set; }
+        
+        public string? UserId { get; set; }
+        
+        [ForeignKey("UserId")]
+        [JsonIgnore]
+        public ApplicationUser? User { get; set; }
     }
 } 

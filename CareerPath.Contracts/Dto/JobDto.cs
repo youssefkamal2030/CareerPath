@@ -1,14 +1,18 @@
 using System;
 using System.ComponentModel.DataAnnotations;
+using System.Text.Json;
+using System.Text.Json.Serialization;
 
 namespace CareerPath.Contracts.Dto
 {
     public class JobDto
     {
         public string JobId { get; set; }
+        [JsonPropertyName("title")]
         public string JobTitle { get; set; }
         public string JobIndustry { get; set; }
         public string CompanyName { get; set; }
+        [JsonPropertyName("description")]
         public string JobDescription { get; set; }
         public string RequiredSkills { get; set; }
         public string ExperienceLevel { get; set; }

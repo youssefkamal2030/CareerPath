@@ -9,7 +9,7 @@ namespace CareerPath.Domain.Entities
 {
     public class Company
     {
-        public int Id { get; set; }
+        public string Id { get; set; }
         public string Name { get; set; }
         public string CompanyProfile { get; set; }
         public string Location { get; set; }

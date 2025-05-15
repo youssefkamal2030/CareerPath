@@ -10,8 +10,6 @@ namespace CareerPath.Application.Interfaces
         Task<JobDto> GetJobByIdAsync(string id);
         Task<IEnumerable<JobDto>> GetAllJobsAsync();
         Task<IEnumerable<JobDto>> GetJobsByUserIdAsync(string userId);
-        Task<JobDto> UpdateJobAsync(string id, UpdateJobDto updateJobDto);
-        Task<bool> DeleteJobAsync(string id);
-        Task<JobDto> CreateJobAsync(CreateJobDto createJobDto);
+      
     }
 }

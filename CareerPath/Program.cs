@@ -161,7 +161,11 @@ namespace CareerPath
                 });
             });
 
-            builder.Services.AddControllers();  
+            builder.Services.AddControllers().AddJsonOptions(options => 
+            {
+                options.JsonSerializerOptions.ReferenceHandler = System.Text.Json.Serialization.ReferenceHandler.Preserve;
+                options.JsonSerializerOptions.DefaultIgnoreCondition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull;
+            });
             builder.Services.AddScoped<ITokenService, TokenService>();
             builder.Services.AddScoped<IAuthService, AuthService>();
 
@@ -177,6 +181,15 @@ namespace CareerPath
             builder.Services.AddScoped<JobNotificationService>();
             builder.Services.AddScoped<ICVAnalysisRepository, CVAnalysisRepository>();
             builder.Services.AddScoped<ICVAnalysisService, CVAnalysisService>();
+
+            //company
+
+            builder.Services.AddScoped<ICompanyRepository, CompanyRepository>();
+            builder.Services.AddScoped<ICompanyService, CompanyService>();
+
+            builder.Services.AddScoped<IJobsService, JobsService>();
+            builder.Services.AddScoped<IJobApplicationRepository, JobApplicationRepository>();
+            builder.Services.AddScoped<IJobApplicationService, JobApplicationService>();
 
             var app = builder.Build();
             if(app.Environment.IsDevelopment())

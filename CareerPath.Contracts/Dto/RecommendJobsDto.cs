@@ -3,14 +3,15 @@ using System.Collections.Generic;
 
 namespace CareerPath.Contracts.Dto
 {
-    public class RecommendJobsRequestDto
+
+    public class RecommendJob
     {
         public ICollection<SkillDto> Skills { get; set; }
-        public ICollection<WorkExperience> WorkExperiences { get; set; }
-        public ICollection<Project> Projects { get; set; }
+        public ICollection<WorkExperienceDto> WorkExperiences { get; set; }
+        public ICollection<ProjectDto> Projects { get; set; }
     }
 
-    public class WorkExperience
+    public class WorkExperienceDtoForAi
     {
         public string Title { get; set; }
         public string Company { get; set; }
@@ -19,7 +20,7 @@ namespace CareerPath.Contracts.Dto
         public string Description { get; set; }
     }
 
-    public class Project
+    public class ProjectD
     {
         public string Name { get; set; }
         public string Description { get; set; }
@@ -56,4 +57,4 @@ namespace CareerPath.Contracts.Dto
         public string RequiredLevel { get; set; }
         public string ImprovementTips { get; set; }
     }
-} 
+}

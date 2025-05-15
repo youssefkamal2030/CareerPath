@@ -11,6 +11,7 @@ namespace CareerPath.Application.Interfaces
     {
         Task<CVAnalysisDto?> GetCVAnalysisByUserIdAsync(string userId);
         Task<bool> SaveCVAnalysisAsync(string userId, CVAnalysisDto cvAnalysis);
-        Task<RecommendJobsResponseDto> RecommendJobsAsync(RecommendJobsRequestDto requestDto);
+        Task<JobRecommendationResponseDto> RecommendJobsAsync(string id);
+        Task<SkillRecommendationResponseDto> RecommnderSystem(string userId);
     }
 }

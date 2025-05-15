@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace CareerPath.Infrastructure.Migrations.AI_DataAnalysis
 {
     [DbContext(typeof(AIDataAnalysisDbContext))]
-    [Migration("20250507190011_extract_Enpoint")]
-    partial class extract_Enpoint
+    [Migration("20250515003207_rebuild")]
+    partial class rebuild
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -24,6 +24,16 @@ namespace CareerPath.Infrastructure.Migrations.AI_DataAnalysis
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
+
+            modelBuilder.Entity("CareerPath.Domain.Entities.AIDataAnalysis.ApplicationUser", b =>
+                {
+                    b.Property<string>("Id")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("ApplicationUser");
+                });
 
             modelBuilder.Entity("CareerPath.Domain.Entities.AIDataAnalysis.Candidate", b =>
                 {
@@ -69,30 +79,26 @@ namespace CareerPath.Infrastructure.Migrations.AI_DataAnalysis
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<string>("UserId")
+                        .HasColumnType("nvarchar(450)");
+
                     b.HasKey("Id");
+
+                    b.HasIndex("UserId");
 
                     b.ToTable("Candidates");
                 });
 
             modelBuilder.Entity("CareerPath.Domain.Entities.AIDataAnalysis.Education", b =>
                 {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("datetime2");
+                    b.Property<string>("Id")
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("Degree")
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
-
-                    b.Property<Guid?>("EducationId")
-                        .HasColumnType("uniqueidentifier");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("EducationLevel")
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<int?>("EndMonth")
                         .HasColumnType("int");
@@ -101,15 +107,13 @@ namespace CareerPath.Infrastructure.Migrations.AI_DataAnalysis
                         .HasColumnType("int");
 
                     b.Property<string>("FieldOfStudy")
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Institution")
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
+                        .HasColumnType("nvarchar(max)");
 
-                    b.Property<Guid?>("PersonalInformationId")
-                        .HasColumnType("uniqueidentifier");
+                    b.Property<string>("PersonalInformationId")
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<int?>("StartMonth")
                         .HasColumnType("int");
@@ -117,16 +121,10 @@ namespace CareerPath.Infrastructure.Migrations.AI_DataAnalysis
                     b.Property<int?>("StartYear")
                         .HasColumnType("int");
 
-                    b.Property<DateTime?>("UpdatedAt")
-                        .HasColumnType("datetime2");
-
                     b.Property<string>("UserId")
-                        .IsRequired()
                         .HasColumnType("nvarchar(450)");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("EducationId");
 
                     b.HasIndex("PersonalInformationId");
 
@@ -205,23 +203,24 @@ namespace CareerPath.Infrastructure.Migrations.AI_DataAnalysis
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<string>("UserId")
+                        .HasColumnType("nvarchar(450)");
+
                     b.HasKey("JobId");
+
+                    b.HasIndex("UserId");
 
                     b.ToTable("Jobs");
                 });
 
             modelBuilder.Entity("CareerPath.Domain.Entities.AIDataAnalysis.PersonalInformation", b =>
                 {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
+                    b.Property<string>("Id")
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("Address")
                         .HasMaxLength(200)
                         .HasColumnType("nvarchar(200)");
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("datetime2");
 
                     b.Property<string>("Email")
                         .HasMaxLength(100)
@@ -231,23 +230,14 @@ namespace CareerPath.Infrastructure.Migrations.AI_DataAnalysis
                         .HasMaxLength(100)
                         .HasColumnType("nvarchar(100)");
 
-                    b.Property<Guid?>("PersonalInformationId")
-                        .HasColumnType("uniqueidentifier");
-
                     b.Property<string>("Phone")
                         .HasMaxLength(20)
                         .HasColumnType("nvarchar(20)");
 
-                    b.Property<DateTime?>("UpdatedAt")
-                        .HasColumnType("datetime2");
-
                     b.Property<string>("UserId")
-                        .IsRequired()
                         .HasColumnType("nvarchar(450)");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("PersonalInformationId");
 
                     b.HasIndex("UserId");
 
@@ -256,49 +246,33 @@ namespace CareerPath.Infrastructure.Migrations.AI_DataAnalysis
 
             modelBuilder.Entity("CareerPath.Domain.Entities.AIDataAnalysis.Project", b =>
                 {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("datetime2");
+                    b.Property<string>("Id")
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("Description")
-                        .HasMaxLength(2000)
-                        .HasColumnType("nvarchar(2000)");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTime?>("EndDate")
                         .HasColumnType("datetime2");
 
-                    b.Property<Guid?>("PersonalInformationId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<Guid?>("ProjectId")
-                        .HasColumnType("uniqueidentifier");
+                    b.Property<string>("PersonalInformationId")
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("ProjectName")
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTime?>("StartDate")
                         .HasColumnType("datetime2");
 
-                    b.Property<DateTime?>("UpdatedAt")
-                        .HasColumnType("datetime2");
-
                     b.Property<string>("Url")
-                        .HasMaxLength(200)
-                        .HasColumnType("nvarchar(200)");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("UserId")
-                        .IsRequired()
                         .HasColumnType("nvarchar(450)");
 
                     b.HasKey("Id");
 
                     b.HasIndex("PersonalInformationId");
-
-                    b.HasIndex("ProjectId");
 
                     b.HasIndex("UserId");
 
@@ -307,39 +281,26 @@ namespace CareerPath.Infrastructure.Migrations.AI_DataAnalysis
 
             modelBuilder.Entity("CareerPath.Domain.Entities.AIDataAnalysis.Skill", b =>
                 {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
+                    b.Property<string>("Id")
+                        .HasColumnType("nvarchar(450)");
 
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<Guid>("PersonalInformationId")
-                        .HasColumnType("uniqueidentifier");
+                    b.Property<string>("PersonalInformationId")
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("ProficiencyLevel")
                         .HasMaxLength(50)
                         .HasColumnType("nvarchar(50)");
 
-                    b.Property<Guid?>("SkillId")
-                        .HasColumnType("uniqueidentifier");
-
                     b.Property<string>("SkillName")
                         .HasMaxLength(100)
                         .HasColumnType("nvarchar(100)");
 
-                    b.Property<DateTime?>("UpdatedAt")
-                        .HasColumnType("datetime2");
-
                     b.Property<string>("UserId")
-                        .IsRequired()
                         .HasColumnType("nvarchar(450)");
 
                     b.HasKey("Id");
 
                     b.HasIndex("PersonalInformationId");
-
-                    b.HasIndex("SkillId");
 
                     b.HasIndex("UserId");
 
@@ -369,27 +330,28 @@ namespace CareerPath.Infrastructure.Migrations.AI_DataAnalysis
                         .IsRequired()
                         .HasColumnType("nvarchar(450)");
 
+                    b.Property<string>("UserId")
+                        .HasColumnType("nvarchar(450)");
+
                     b.HasKey("ApplicationId");
 
                     b.HasIndex("CandidateId");
 
                     b.HasIndex("JobId");
 
+                    b.HasIndex("UserId");
+
                     b.ToTable("Applications");
                 });
 
             modelBuilder.Entity("CareerPath.Domain.Entities.AIDataAnalysis.WorkExperience", b =>
                 {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
+                    b.Property<string>("Id")
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("Company")
                         .HasMaxLength(100)
                         .HasColumnType("nvarchar(100)");
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("datetime2");
 
                     b.Property<int?>("EndMonth")
                         .HasColumnType("int");
@@ -409,8 +371,8 @@ namespace CareerPath.Infrastructure.Migrations.AI_DataAnalysis
                         .HasMaxLength(100)
                         .HasColumnType("nvarchar(100)");
 
-                    b.Property<Guid?>("PersonalInformationId")
-                        .HasColumnType("uniqueidentifier");
+                    b.Property<string>("PersonalInformationId")
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<int?>("StartMonth")
                         .HasColumnType("int");
@@ -418,15 +380,8 @@ namespace CareerPath.Infrastructure.Migrations.AI_DataAnalysis
                     b.Property<int?>("StartYear")
                         .HasColumnType("int");
 
-                    b.Property<DateTime?>("UpdatedAt")
-                        .HasColumnType("datetime2");
-
                     b.Property<string>("UserId")
-                        .IsRequired()
                         .HasColumnType("nvarchar(450)");
-
-                    b.Property<Guid?>("WorkExperienceId")
-                        .HasColumnType("uniqueidentifier");
 
                     b.HasKey("Id");
 
@@ -434,149 +389,75 @@ namespace CareerPath.Infrastructure.Migrations.AI_DataAnalysis
 
                     b.HasIndex("UserId");
 
-                    b.HasIndex("WorkExperienceId");
-
                     b.ToTable("WorkExperiences");
                 });
 
-            modelBuilder.Entity("EducationProject", b =>
+            modelBuilder.Entity("CareerPath.Domain.Entities.AIDataAnalysis.Candidate", b =>
                 {
-                    b.Property<Guid>("EducationsId")
-                        .HasColumnType("uniqueidentifier");
+                    b.HasOne("CareerPath.Domain.Entities.AIDataAnalysis.ApplicationUser", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId");
 
-                    b.Property<Guid>("ProjectsId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.HasKey("EducationsId", "ProjectsId");
-
-                    b.HasIndex("ProjectsId");
-
-                    b.ToTable("EducationProject");
-                });
-
-            modelBuilder.Entity("EducationSkill", b =>
-                {
-                    b.Property<Guid>("EducationsId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<Guid>("SkillsId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.HasKey("EducationsId", "SkillsId");
-
-                    b.HasIndex("SkillsId");
-
-                    b.ToTable("EducationSkill");
-                });
-
-            modelBuilder.Entity("EducationWorkExperience", b =>
-                {
-                    b.Property<Guid>("EducationsId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<Guid>("WorkExperiencesId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.HasKey("EducationsId", "WorkExperiencesId");
-
-                    b.HasIndex("WorkExperiencesId");
-
-                    b.ToTable("EducationWorkExperience");
-                });
-
-            modelBuilder.Entity("ProjectSkill", b =>
-                {
-                    b.Property<Guid>("ProjectsId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<Guid>("SkillsId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.HasKey("ProjectsId", "SkillsId");
-
-                    b.HasIndex("SkillsId");
-
-                    b.ToTable("ProjectSkill");
-                });
-
-            modelBuilder.Entity("ProjectWorkExperience", b =>
-                {
-                    b.Property<Guid>("ProjectsId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<Guid>("WorkExperiencesId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.HasKey("ProjectsId", "WorkExperiencesId");
-
-                    b.HasIndex("WorkExperiencesId");
-
-                    b.ToTable("ProjectWorkExperience");
-                });
-
-            modelBuilder.Entity("SkillWorkExperience", b =>
-                {
-                    b.Property<Guid>("SkillsId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<Guid>("WorkExperiencesId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.HasKey("SkillsId", "WorkExperiencesId");
-
-                    b.HasIndex("WorkExperiencesId");
-
-                    b.ToTable("SkillWorkExperience");
+                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("CareerPath.Domain.Entities.AIDataAnalysis.Education", b =>
                 {
-                    b.HasOne("CareerPath.Domain.Entities.AIDataAnalysis.Education", null)
-                        .WithMany("Educations")
-                        .HasForeignKey("EducationId");
-
-                    b.HasOne("CareerPath.Domain.Entities.AIDataAnalysis.PersonalInformation", "PersonalInformation")
+                    b.HasOne("CareerPath.Domain.Entities.AIDataAnalysis.PersonalInformation", null)
                         .WithMany("Educations")
                         .HasForeignKey("PersonalInformationId");
 
-                    b.Navigation("PersonalInformation");
+                    b.HasOne("CareerPath.Domain.Entities.AIDataAnalysis.ApplicationUser", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId");
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("CareerPath.Domain.Entities.AIDataAnalysis.Job", b =>
+                {
+                    b.HasOne("CareerPath.Domain.Entities.AIDataAnalysis.ApplicationUser", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId");
+
+                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("CareerPath.Domain.Entities.AIDataAnalysis.PersonalInformation", b =>
                 {
-                    b.HasOne("CareerPath.Domain.Entities.AIDataAnalysis.PersonalInformation", "PersonalInformation")
+                    b.HasOne("CareerPath.Domain.Entities.AIDataAnalysis.ApplicationUser", "User")
                         .WithMany()
-                        .HasForeignKey("PersonalInformationId");
+                        .HasForeignKey("UserId");
 
-                    b.Navigation("PersonalInformation");
+                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("CareerPath.Domain.Entities.AIDataAnalysis.Project", b =>
                 {
-                    b.HasOne("CareerPath.Domain.Entities.AIDataAnalysis.PersonalInformation", "PersonalInformation")
+                    b.HasOne("CareerPath.Domain.Entities.AIDataAnalysis.PersonalInformation", null)
                         .WithMany("Projects")
                         .HasForeignKey("PersonalInformationId");
 
-                    b.HasOne("CareerPath.Domain.Entities.AIDataAnalysis.Project", null)
-                        .WithMany("Projects")
-                        .HasForeignKey("ProjectId");
+                    b.HasOne("CareerPath.Domain.Entities.AIDataAnalysis.ApplicationUser", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId");
 
-                    b.Navigation("PersonalInformation");
+                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("CareerPath.Domain.Entities.AIDataAnalysis.Skill", b =>
                 {
                     b.HasOne("CareerPath.Domain.Entities.AIDataAnalysis.PersonalInformation", "PersonalInformation")
                         .WithMany("Skills")
-                        .HasForeignKey("PersonalInformationId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("PersonalInformationId");
 
-                    b.HasOne("CareerPath.Domain.Entities.AIDataAnalysis.Skill", null)
-                        .WithMany("Skills")
-                        .HasForeignKey("SkillId");
+                    b.HasOne("CareerPath.Domain.Entities.AIDataAnalysis.ApplicationUser", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId");
 
                     b.Navigation("PersonalInformation");
+
+                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("CareerPath.Domain.Entities.AIDataAnalysis.UserApplication", b =>
@@ -584,126 +465,37 @@ namespace CareerPath.Infrastructure.Migrations.AI_DataAnalysis
                     b.HasOne("CareerPath.Domain.Entities.AIDataAnalysis.Candidate", "Candidate")
                         .WithMany()
                         .HasForeignKey("CandidateId")
-                        .OnDelete(DeleteBehavior.Restrict)
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.HasOne("CareerPath.Domain.Entities.AIDataAnalysis.Job", "Job")
                         .WithMany()
                         .HasForeignKey("JobId")
-                        .OnDelete(DeleteBehavior.Restrict)
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.HasOne("CareerPath.Domain.Entities.AIDataAnalysis.ApplicationUser", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId");
 
                     b.Navigation("Candidate");
 
                     b.Navigation("Job");
+
+                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("CareerPath.Domain.Entities.AIDataAnalysis.WorkExperience", b =>
                 {
-                    b.HasOne("CareerPath.Domain.Entities.AIDataAnalysis.PersonalInformation", "PersonalInformation")
+                    b.HasOne("CareerPath.Domain.Entities.AIDataAnalysis.PersonalInformation", null)
                         .WithMany("WorkExperiences")
                         .HasForeignKey("PersonalInformationId");
 
-                    b.HasOne("CareerPath.Domain.Entities.AIDataAnalysis.WorkExperience", null)
-                        .WithMany("WorkExperiences")
-                        .HasForeignKey("WorkExperienceId");
-
-                    b.Navigation("PersonalInformation");
-                });
-
-            modelBuilder.Entity("EducationProject", b =>
-                {
-                    b.HasOne("CareerPath.Domain.Entities.AIDataAnalysis.Education", null)
+                    b.HasOne("CareerPath.Domain.Entities.AIDataAnalysis.ApplicationUser", "User")
                         .WithMany()
-                        .HasForeignKey("EducationsId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("UserId");
 
-                    b.HasOne("CareerPath.Domain.Entities.AIDataAnalysis.Project", null)
-                        .WithMany()
-                        .HasForeignKey("ProjectsId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-                });
-
-            modelBuilder.Entity("EducationSkill", b =>
-                {
-                    b.HasOne("CareerPath.Domain.Entities.AIDataAnalysis.Education", null)
-                        .WithMany()
-                        .HasForeignKey("EducationsId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("CareerPath.Domain.Entities.AIDataAnalysis.Skill", null)
-                        .WithMany()
-                        .HasForeignKey("SkillsId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-                });
-
-            modelBuilder.Entity("EducationWorkExperience", b =>
-                {
-                    b.HasOne("CareerPath.Domain.Entities.AIDataAnalysis.Education", null)
-                        .WithMany()
-                        .HasForeignKey("EducationsId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("CareerPath.Domain.Entities.AIDataAnalysis.WorkExperience", null)
-                        .WithMany()
-                        .HasForeignKey("WorkExperiencesId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-                });
-
-            modelBuilder.Entity("ProjectSkill", b =>
-                {
-                    b.HasOne("CareerPath.Domain.Entities.AIDataAnalysis.Project", null)
-                        .WithMany()
-                        .HasForeignKey("ProjectsId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("CareerPath.Domain.Entities.AIDataAnalysis.Skill", null)
-                        .WithMany()
-                        .HasForeignKey("SkillsId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-                });
-
-            modelBuilder.Entity("ProjectWorkExperience", b =>
-                {
-                    b.HasOne("CareerPath.Domain.Entities.AIDataAnalysis.Project", null)
-                        .WithMany()
-                        .HasForeignKey("ProjectsId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("CareerPath.Domain.Entities.AIDataAnalysis.WorkExperience", null)
-                        .WithMany()
-                        .HasForeignKey("WorkExperiencesId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-                });
-
-            modelBuilder.Entity("SkillWorkExperience", b =>
-                {
-                    b.HasOne("CareerPath.Domain.Entities.AIDataAnalysis.Skill", null)
-                        .WithMany()
-                        .HasForeignKey("SkillsId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("CareerPath.Domain.Entities.AIDataAnalysis.WorkExperience", null)
-                        .WithMany()
-                        .HasForeignKey("WorkExperiencesId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-                });
-
-            modelBuilder.Entity("CareerPath.Domain.Entities.AIDataAnalysis.Education", b =>
-                {
-                    b.Navigation("Educations");
+                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("CareerPath.Domain.Entities.AIDataAnalysis.PersonalInformation", b =>
@@ -714,21 +506,6 @@ namespace CareerPath.Infrastructure.Migrations.AI_DataAnalysis
 
                     b.Navigation("Skills");
 
-                    b.Navigation("WorkExperiences");
-                });
-
-            modelBuilder.Entity("CareerPath.Domain.Entities.AIDataAnalysis.Project", b =>
-                {
-                    b.Navigation("Projects");
-                });
-
-            modelBuilder.Entity("CareerPath.Domain.Entities.AIDataAnalysis.Skill", b =>
-                {
-                    b.Navigation("Skills");
-                });
-
-            modelBuilder.Entity("CareerPath.Domain.Entities.AIDataAnalysis.WorkExperience", b =>
-                {
                     b.Navigation("WorkExperiences");
                 });
 #pragma warning restore 612, 618

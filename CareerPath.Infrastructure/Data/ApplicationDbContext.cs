@@ -19,6 +19,8 @@ namespace CareerPath.Infrastructure.Data
         public DbSet<Company> Companies { get; set; }
         public DbSet<FavoriteJob> FavoriteJobs { get; set; }
         public DbSet<UserApplication> UserApplications { get; set; }
+        public DbSet<Review> Reviews { get; set; }
+        public DbSet<JobApplication> JobApplications { get; set; }
 
         protected override void OnModelCreating(ModelBuilder builder)
         {
@@ -104,6 +106,39 @@ namespace CareerPath.Infrastructure.Data
                     .HasForeignKey(a => a.JobId)
                     .OnDelete(DeleteBehavior.Restrict)
                     .IsRequired(false);
+            });
+
+            // Configure Review entity
+            builder.Entity<Review>(entity =>
+            {
+                entity.HasKey(e => e.Id);
+                entity.Property(e => e.Comment).IsRequired();
+                
+
+                // Configure relationship with UserProfile
+                entity.HasOne(r => r.UserProfile)
+                    .WithMany()
+                    .HasForeignKey(r => r.UserProfileId)
+                    .OnDelete(DeleteBehavior.Restrict)
+                    .IsRequired();
+            });
+
+            // Configure JobApplication entity
+            builder.Entity<JobApplication>(entity =>
+            {
+                entity.HasKey(e => e.Id);
+                entity.Property(e => e.JobId).IsRequired();
+                entity.Property(e => e.userId).IsRequired();
+                entity.Property(e => e.ApplicationStatus).IsRequired();
+                entity.Property(e => e.ApplicationDate).IsRequired();
+                entity.Property(e => e.ResumeUrl).IsRequired();
+
+                // Configure relationship with ApplicationUser
+                entity.HasOne(a => a.User)
+                    .WithMany()
+                    .HasForeignKey(a => a.userId)
+                    .OnDelete(DeleteBehavior.Restrict)
+                    .IsRequired();
             });
         }
     }

@@ -5,7 +5,7 @@ using Microsoft.AspNetCore.Identity;
 using CareerPath.Domain.Entities;
 using CareerPath.Application.Interfaces;
 using AutoMapper;
-
+using static System.Net.Http.HttpClient;
 namespace CareerPath.Api.Controllers
 {
     [ApiController]
@@ -88,63 +88,39 @@ namespace CareerPath.Api.Controllers
             }
         }
 
-        [HttpPost("recommend")]
-        public async Task<IActionResult> RecommendJobs([FromBody] RecommendJobsRequestDto requestDto)
+   
+        [HttpPost("recommend/{userId}")]
+        public async Task<IActionResult> RecommendJobsById(string userId)
         {
             try
             {
-                if (requestDto == null)
-                {
-                    return BadRequest("Invalid request data");
-                }
-
-                var response = await _cvAnalysisService.RecommendJobsAsync(requestDto);
+                var response =await _cvAnalysisService.RecommendJobsAsync(userId);
+                _logger.LogInformation("Recommended jobs for user {UserId}", userId);
+                _logger.LogInformation("Response: {Response}", response);
                 return Ok(response);
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error recommending jobs");
+                _logger.LogError(ex, "Error recommending jobs for user {Email}", userId);
                 return StatusCode(500, "An error occurred while processing your request");
             }
         }
-
-        [HttpGet("recommend/{email}")]
-        public async Task<IActionResult> RecommendJobsByEmail(string email)
+        [HttpPost("recommenderSystem/{userId}")]
+        public async Task<IActionResult> RecommenderSystem(string userId)
         {
             try
             {
-                var user = await _userManager.FindByEmailAsync(email);
-                if (user == null)
-                {
-                    return NotFound($"User with email {email} not found");
-                }
-
-                var analysis = await _cvAnalysisService.GetCVAnalysisByUserIdAsync(user.Id);
-                if (analysis == null)
-                {
-                    return NotFound("No CV analysis data found for this user");
-                }
-
-                
-                var requestDto = _mapper.Map<RecommendJobsRequestDto>(analysis);
-                 if (analysis.WorkExperiences?.Any() == true)
-                {
-                    requestDto.WorkExperiences = _mapper.Map<List<WorkExperience>>(analysis.WorkExperiences);
-                }
-                
-                if (analysis.Projects?.Any() == true)
-                {
-                    requestDto.Projects = _mapper.Map<List<Project>>(analysis.Projects);
-                }
-
-                var response = await _cvAnalysisService.RecommendJobsAsync(requestDto);
+                var response = await _cvAnalysisService.RecommnderSystem(userId);
+                _logger.LogInformation("Recommended jobs for user {UserId}", userId);
+                _logger.LogInformation("Response: {Response}", response);
                 return Ok(response);
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error recommending jobs for user {Email}", email);
+                _logger.LogError(ex, "Error recommending jobs for user {Email}", userId);
                 return StatusCode(500, "An error occurred while processing your request");
             }
         }
+
     }
 }
