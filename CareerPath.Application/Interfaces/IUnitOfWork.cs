@@ -1,0 +1,25 @@
+﻿using CareerPath.Domain.Entities.AIDataAnalysis;
+using System;
+using System.Threading.Tasks;
+
+namespace CareerPath.Application.Interfaces
+{
+    public interface IUnitOfWork : IDisposable
+    {
+        IUserProfileRepository UserProfiles { get; }
+        ICompanyRepository Companies { get; }
+        IJobRepository Jobs { get; }
+        IJobApplicationRepository JobApplications { get; }
+        ICVAnalysisRepository CVAnalysis { get; }
+
+        IBaseRepository<Candidate> AIDataAnalysis_Candidate { get; }
+        IBaseRepository<PersonalInformation> AIDataAnalysis_PersonalInformation { get; }
+        IBaseRepository<Skill> AIDataAnalysis_Skill { get; }
+        IBaseRepository<WorkExperience> AIDataAnalysis_WorkExperience { get; }
+        IBaseRepository<Education> AIDataAnalysis_Education { get; }
+        IBaseRepository<Project> AIDataAnalysis_Project { get; }
+
+        Task<int> CompleteAsync();
+        Task<int> CompleteAsyncAi();
+    }
+}

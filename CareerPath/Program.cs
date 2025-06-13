@@ -16,6 +16,7 @@ using CareerPath.Infrastructure.Repository;
 using EmailConfigration.EmailConfig;
 using CareerPath.Application.AIDataAnalysis_Interfaces;
 using CareerPath.Application.Configuration;
+using MediatR;
 
 namespace CareerPath
 {
@@ -45,10 +46,6 @@ namespace CareerPath
                         errorNumbersToAdd: null);
                 }));
                 
-            // SQLite configuration (commented out)
-            // builder.Services.AddDbContext<ApplicationDbContext>(options =>
-            //     options.UseSqlite(builder.Configuration.GetConnectionString("SqliteConnection")));
-            
             builder.Services.AddDefaultIdentity<ApplicationUser>(options =>
             {
                 options.Password.RequireDigit = true;
@@ -166,29 +163,24 @@ namespace CareerPath
                 options.JsonSerializerOptions.ReferenceHandler = System.Text.Json.Serialization.ReferenceHandler.Preserve;
                 options.JsonSerializerOptions.DefaultIgnoreCondition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull;
             });
+
+            // Register UnitOfWork
+            builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
+
+            // Register MediatR
+            builder.Services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(typeof(UserProfileService).Assembly));
+
             builder.Services.AddScoped<ITokenService, TokenService>();
             builder.Services.AddScoped<IAuthService, AuthService>();
 
-            //  UserProfile services
-            builder.Services.AddScoped<IUserProfileRepository, UserProfileRepository>();
+            //  Application services
             builder.Services.AddScoped<IUserProfileService, UserProfileService>();
             builder.Services.AddScoped<IEmailService, SmtpEmailService>();
             builder.Services.AddScoped<EmailSender>();
-
-            //  AI Data Analysis services
-            builder.Services.AddScoped<IJobsRepository, JobRepository>();
             builder.Services.AddScoped<IJobsService, JobsService>();
             builder.Services.AddScoped<JobNotificationService>();
-            builder.Services.AddScoped<ICVAnalysisRepository, CVAnalysisRepository>();
             builder.Services.AddScoped<ICVAnalysisService, CVAnalysisService>();
-
-            //company
-
-            builder.Services.AddScoped<ICompanyRepository, CompanyRepository>();
             builder.Services.AddScoped<ICompanyService, CompanyService>();
-
-            builder.Services.AddScoped<IJobsService, JobsService>();
-            builder.Services.AddScoped<IJobApplicationRepository, JobApplicationRepository>();
             builder.Services.AddScoped<IJobApplicationService, JobApplicationService>();
 
             var app = builder.Build();
@@ -207,9 +199,6 @@ namespace CareerPath
                 app.UseExceptionHandler("/Home/Error");
                 app.UseHsts();
             }
-
-          
-     
 
             app.UseCors("AllowAll");
             

@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace CareerPath.Domain.Entities
 {
-    public class UserProfile
+    public class UserProfile : AggregateRoot
     {
         public string  Id { get; private set; }
         public string FirstName { get; private set; }
@@ -56,28 +56,17 @@ namespace CareerPath.Domain.Entities
             AvatarUrl = avatarUrl;
             CoverUrl = coverUrl;
             JobTitle = jobTitle;
-            Skills = skills ?? new List<string>();
+            Skills = skills;
             UpdatedAt = DateTime.UtcNow;
-        }
-        
-        public void UpdateBasicInfo(string firstName, string lastName, string avatarUrl)
-        {
-            FirstName = firstName;
-            LastName = lastName;
-            AvatarUrl = avatarUrl;
-            UpdatedAt = DateTime.UtcNow;
-        }
 
-        public void SetUsername(string username)
-        {
-            Username = username;
-            UpdatedAt = DateTime.UtcNow;
-        }
-
-        public void SetEmail(string email)
-        {
-            Email = email;
-            UpdatedAt = DateTime.UtcNow;
+            AddDomainEvent(new UserProfileUpdatedEvent
+            {
+                UserId = Id,
+                FirstName = FirstName,
+                LastName = LastName,
+                Skills = Skills,
+                UpdatedAt = UpdatedAt
+            });
         }
     }
 }

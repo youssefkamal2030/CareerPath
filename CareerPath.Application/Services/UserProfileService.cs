@@ -9,156 +9,105 @@ using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 using AutoMapper;
 using Microsoft.AspNetCore.Identity;
+using MediatR;
+using CareerPath.Domain.Events;
 
 namespace CareerPath.Application.Services
 {
     public class UserProfileService : IUserProfileService
     {
-        private readonly IUserProfileRepository _userProfileRepository;
+        private readonly IUnitOfWork _unitOfWork;
         private readonly IMapper _mapper;
         private readonly UserManager<ApplicationUser> _userManager;
+        private readonly IMediator _mediator;
 
-        public UserProfileService(IUserProfileRepository userProfileRepository, IMapper mapper, UserManager<ApplicationUser> userManager)
+        public UserProfileService(IUnitOfWork unitOfWork, IMapper mapper, UserManager<ApplicationUser> userManager, IMediator mediator)
         {
-            _userProfileRepository = userProfileRepository;
+            _unitOfWork = unitOfWork;
             _mapper = mapper;
             _userManager = userManager;
+            _mediator = mediator;
         }
 
         public async Task<UserProfileDto> GetByIdAsync(string id)
         {
-            try
-            {
-                var userProfile = await _userProfileRepository.GetByIdAsync(id);
-                return userProfile != null ? _mapper.Map<UserProfileDto>(userProfile) : null;
-            }
-            catch (SqlException)
-            {
-                // Log error and return null
-                Console.WriteLine("Database connection error in GetByIdAsync");
-                return null;
-            }
-            catch (Exception ex)
-            {
-                // Log the exception
-                Console.WriteLine($"Error in GetByIdAsync: {ex.Message}");
-                return null;
-            }
+            var userProfile = await _unitOfWork.UserProfiles.GetByIdAsync(id);
+            return userProfile != null ? _mapper.Map<UserProfileDto>(userProfile) : null;
         }
 
         public async Task<IEnumerable<UserProfileDto>> GetAllAsync()
         {
-            try
-            {
-                var userProfiles = await _userProfileRepository.GetAllAsync();
-                return _mapper.Map<IEnumerable<UserProfileDto>>(userProfiles);
-            }
-            catch (SqlException)
-            {
-                // Log error and return empty list
-                Console.WriteLine("Database connection error in GetAllAsync");
-                return new List<UserProfileDto>();
-            }
-            catch (Exception ex)
-            {
-                // Log the exception
-                Console.WriteLine($"Error in GetAllAsync: {ex.Message}");
-                return new List<UserProfileDto>();
-            }
+            var userProfiles = await _unitOfWork.UserProfiles.GetAllAsync();
+            return _mapper.Map<IEnumerable<UserProfileDto>>(userProfiles);
         }
 
         public async Task<UserProfileDto> CreateAsync(string userId, CreateUserProfileDto dto)
         {
-            try
-            {
-                // Get user's email and username
-                var user = await _userManager.FindByIdAsync(userId);
-                string email = user?.Email ?? dto.Email;
-                string username = user?.UserName ?? "User";
+            var user = await _userManager.FindByIdAsync(userId);
+            string email = user?.Email ?? dto.Email;
+            string username = user?.UserName ?? "User";
 
-                var userProfile = _mapper.Map<UserProfile>(dto, opts => 
-                {
-                    opts.Items["UserId"] = userId;
-                    opts.Items["Email"] = email;
-                    opts.Items["Username"] = username;
-                });
-                
-                var createdProfile = await _userProfileRepository.CreateAsync(userProfile);
-                return _mapper.Map<UserProfileDto>(createdProfile);
-            }
-            catch (SqlException)
+            var userProfile = _mapper.Map<UserProfile>(dto, opts =>
             {
-                // Log error
-                Console.WriteLine("Database connection error in CreateAsync");
-                return null;
-            }
-            catch (DbUpdateException)
+                opts.Items["UserId"] = userId;
+                opts.Items["Email"] = email;
+                opts.Items["Username"] = username;
+            });
+
+            await _unitOfWork.UserProfiles.AddAsync(userProfile);
+            await _unitOfWork.CompleteAsync();
+
+            var userProfileDto = _mapper.Map<UserProfileDto>(userProfile);
+
+            // Dispatch event
+            var userProfileUpdatedEvent = new UserProfileUpdatedEvent
             {
-                Console.WriteLine("Database update error in CreateAsync");
-                return null;
-            }
-            catch (Exception ex)
-            {
-                // Log the exception
-                Console.WriteLine($"Error in CreateAsync: {ex.Message}");
-                return null;
-            }
+                UserId = userProfile.Id,
+                FirstName = userProfile.FirstName,
+                LastName = userProfile.LastName,
+                Skills = userProfile.Skills,
+                UpdatedAt = DateTime.UtcNow
+            };
+            await _mediator.Publish(userProfileUpdatedEvent);
+
+            return userProfileDto;
         }
 
         public async Task<UserProfileDto> UpdateAsync(string id, UpdateUserProfileDto dto)
         {
-            try
-            {
-                var userProfile = await _userProfileRepository.GetByIdAsync(id);
-                if (userProfile == null)
-                    return null;
+            var userProfile = await _unitOfWork.UserProfiles.GetByIdAsync(id);
+            if (userProfile == null)
+                return null;
 
-                _mapper.Map(dto, userProfile);
-                var updatedProfile = await _userProfileRepository.UpdateAsync(userProfile);
-                return _mapper.Map<UserProfileDto>(updatedProfile);
-            }
-            catch (SqlException)
+            _mapper.Map(dto, userProfile);
+            _unitOfWork.UserProfiles.Update(userProfile);
+            await _unitOfWork.CompleteAsync();
+
+            var userProfileDto = _mapper.Map<UserProfileDto>(userProfile);
+
+            // Dispatch event
+            var userProfileUpdatedEvent = new UserProfileUpdatedEvent
             {
-                // Log error
-                Console.WriteLine("Database connection error in UpdateAsync");
-                return null;
-            }
-            catch (DbUpdateException)
-            {
-                Console.WriteLine("Database update error in UpdateAsync");
-                return null;
-            }
-            catch (Exception ex)
-            {
-                // Log the exception
-                Console.WriteLine($"Error in UpdateAsync: {ex.Message}");
-                return null;
-            }
+                UserId = userProfile.Id,
+                FirstName = userProfile.FirstName,
+                LastName = userProfile.LastName,
+                Skills = userProfile.Skills,
+                UpdatedAt = DateTime.UtcNow
+            };
+            await _mediator.Publish(userProfileUpdatedEvent);
+
+            return userProfileDto;
         }
 
         public async Task<bool> DeleteAsync(string id)
         {
-            try
-            {
-                return await _userProfileRepository.DeleteAsync(id);
-            }
-            catch (SqlException)
-            {
-                // Log error
-                Console.WriteLine("Database connection error in DeleteAsync");
+            var userProfile = await _unitOfWork.UserProfiles.GetByIdAsync(id);
+            if (userProfile == null)
                 return false;
-            }
-            catch (DbUpdateException)
-            {
-                Console.WriteLine("Database update error in DeleteAsync");
-                return false;
-            }
-            catch (Exception ex)
-            {
-                // Log the exception
-                Console.WriteLine($"Error in DeleteAsync: {ex.Message}");
-                return false;
-            }
+
+            _unitOfWork.UserProfiles.Remove(userProfile);
+            await _unitOfWork.CompleteAsync();
+            return true;
         }
     }
 } 
