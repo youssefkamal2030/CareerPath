@@ -613,19 +613,11 @@ coverage/
 **/models/pretrained/
 
 # Secrets and credentials
-appsettings.*.json
-!appsettings.example.json
-**/Properties/launchSettings.json
-**/*secrets*.*
-**/*credentials*.*
-**/*Secret*.*
-**/*Credential*.*
-**/*ApiKey*.*
-**/*ConnectionString*.*
-**/*.pfx
-**/*.key
-**/*.pem
-ServiceAccount*.json
+# Remove or comment out the following line to allow appsettings.json:
+# appsettings.*.json
+
+# Explicitly allow appsettings.json
+!appsettings.json
 
 # ASP.NET Core User Secrets
 **/secrets.json
