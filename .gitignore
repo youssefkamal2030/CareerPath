@@ -620,7 +620,6 @@ appsettings.*.json
 **/*credentials*.*
 **/*Secret*.*
 **/*Credential*.*
-**/*Password*.*
 **/*ApiKey*.*
 **/*ConnectionString*.*
 **/*.pfx
