@@ -1,5 +1,6 @@
 using CareerPath.Application.Interfaces;
 using CareerPath.Infrastructure.Data;
+using Microsoft.Extensions.Logging;
 using System.Threading.Tasks;
 
 namespace CareerPath.Infrastructure.Repository
@@ -8,10 +9,11 @@ namespace CareerPath.Infrastructure.Repository
     {
         private readonly ApplicationDbContext _context;
         private readonly AIDataAnalysisDbContext _aiContext;
+        private readonly ILogger<JobRepository> _logger;
 
         public IUserProfileRepository UserProfiles { get; private set; }
         public ICompanyRepository Companies { get; private set; }
-        public IJobRepository Jobs { get; private set; }
+        public IJobRepository jobs { get; }
         public IJobApplicationRepository JobApplications { get; private set; }
         public ICVAnalysisRepository CVAnalysis { get; private set; }
 
@@ -22,16 +24,16 @@ namespace CareerPath.Infrastructure.Repository
         public IBaseRepository<Domain.Entities.AIDataAnalysis.WorkExperience> AIDataAnalysis_WorkExperience { get; private set; }
         public IBaseRepository<Domain.Entities.AIDataAnalysis.Education> AIDataAnalysis_Education { get; private set; }
         public IBaseRepository<Domain.Entities.AIDataAnalysis.Project> AIDataAnalysis_Project { get; private set; }
-
-
-        public UnitOfWork(ApplicationDbContext context, AIDataAnalysisDbContext aiContext)
+        public UnitOfWork(ApplicationDbContext context, AIDataAnalysisDbContext aiContext, ILogger<JobRepository> logger)
         {
             _context = context;
             _aiContext = aiContext;
+            _logger = logger;
+            
 
             UserProfiles = new UserProfileRepository(_context);
             Companies = new CompanyRepository(_context);
-            Jobs = new JobRepository(_aiContext);
+            jobs = new JobRepository(_aiContext, _logger);
             JobApplications = new JobApplicationRepository(_context);
             CVAnalysis = new CVAnalysisRepository(_aiContext);
 

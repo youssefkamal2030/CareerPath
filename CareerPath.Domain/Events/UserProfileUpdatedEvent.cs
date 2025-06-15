@@ -1,3 +1,5 @@
+using CareerPath.Domain.Events;
+
 public class UserProfileUpdatedEvent : DomainEvent
 {
     public string UserId { get; set; }

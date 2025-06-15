@@ -1,12 +1,10 @@
 # Career Path API Documentation
 
 ## Overview
-
 This document provides comprehensive information about the Career Path API endpoints, their request/response formats, and usage examples.
 
 ## Authentication
-
-All API endpoints require authentication. Include a valid JWT token in the Authorization header:
+Most API endpoints require authentication. Include a valid JWT token in the Authorization header:
 
 ```
 Authorization: Bearer {your_jwt_token}
@@ -14,251 +12,156 @@ Authorization: Bearer {your_jwt_token}
 
 ## API Endpoints
 
-### CV Analysis
+### Auth
 
-#### Get CV Analysis
+- **POST** `/api/auth/register` — Register a new user
+- **POST** `/api/auth/login` — Login and receive a JWT token
+- **POST** `/api/auth/forgot-password` — Request a password reset email
+- **POST** `/api/auth/reset-password` — Reset password using token
+- **GET** `/api/auth/hello` — Health check (no auth required)
 
-Retrieves a user's CV analysis data.
+### User Profiles
 
-- **URL**: `/api/cv-analysis/{userId}`
-- **Method**: `GET`
-- **URL Parameters**:
-  - `userId`: ID of the user
+- **GET** `/api/profiles` — Get all user profiles (auth required)
+- **GET** `/api/profiles/{id}` — Get a user profile by ID (auth required)
+- **PUT** `/api/profiles/{id}` — Update a user profile (auth required, only self)
+- **DELETE** `/api/profiles/{id}` — Delete a user profile (auth required, only self)
 
-**Success Response**:
-- **Code**: 200 OK
-- **Content Example**:
+### Companies
+
+- **GET** `/api/companies` — Get all companies
+- **GET** `/api/companies/{id}` — Get a company by ID
+- **POST** `/api/companies` — Create a new company (not yet implemented)
+- **PUT** `/api/companies/{id}` — Update a company (not yet implemented)
+- **DELETE** `/api/companies/{id}` — Delete a company (not yet implemented)
+- **GET** `/api/companies/{id}/jobs` — Get jobs for a specific company
+
+### Job Applications
+
+- **GET** `/api/jobapplication/{id}` — Get a job application by ID
+- **GET** `/api/jobapplication/user?id={userId}` — Get job applications for a user
+- **GET** `/api/jobapplication/jobs` — Get all job applications
+
+### AI & CV Analysis
+
+- **POST** `/api/ai/extract` — Save extracted CV analysis data
+  - Request body: `CVAnalysisDto`
+- **GET** `/api/ai/analysis/{email}` — Get CV analysis by user email
+- **POST** `/api/ai/recommend/{userId}` — Recommend jobs for a user
+- **POST** `/api/ai/recommenderSystem/{userId}` — Get job recommendations from recommender system
+
+## Example Request/Response Formats
+
+### Auth
+#### Register
+- **POST** `/api/auth/register`
+- Request body:
 ```json
 {
-  "personalInformation": {
-    "name": "John Doe",
-    "email": "john.doe@example.com",
-    "phone": "+1234567890",
-    "address": "123 Main St, City, Country"
-  },
-  "skills": [
-    {
-      "skillName": "C#",
-      "proficiencyLevel": "Expert"
-    },
-    {
-      "skillName": "JavaScript",
-      "proficiencyLevel": "Intermediate"
-    }
-  ],
-  "workExperiences": [
-    {
-      "jobTitle": "Full Stack Developer",
-      "jobLevel": "Senior",
-      "company": "Tech Corp",
-      "startYear": 2018,
-      "startMonth": 3,
-      "endYear": 2022,
-      "endMonth": 6,
-      "jobDescription": "Developed and maintained enterprise web applications"
-    }
-  ],
-  "educations": [
-    {
-      "institution": "University of Technology",
-      "degree": "Bachelor's",
-      "fieldOfStudy": "Computer Science",
-      "startYear": 2014,
-      "startMonth": 9,
-      "endYear": 2018,
-      "endMonth": 6,
-      "educationLevel": "Bachelor"
-    }
-  ],
-  "projects": [
-    {
-      "projectName": "E-commerce Platform",
-      "startDate": "2021-02-01T00:00:00",
-      "endDate": "2021-08-30T00:00:00",
-      "url": "https://github.com/johndoe/ecommerce",
-      "description": "Built a full-featured e-commerce platform using ASP.NET Core and React"
-    }
-  ]
+  "email": "user@example.com",
+  "password": "string",
+  "username": "string"
 }
 ```
+- Success: `200 OK` `{ "Message": "User registered successfully" }`
+- Error: `400 Bad Request` `{ "Error": "..." }`
 
-**Error Response**:
-- **Code**: 404 Not Found
-- **Content**: `{ "message": "CV analysis not found for the specified user" }`
-
-#### Save CV Analysis
-
-Saves or updates a user's CV analysis data.
-
-- **URL**: `/api/cv-analysis/{userId}`
-- **Method**: `POST`
-- **URL Parameters**:
-  - `userId`: ID of the user
-- **Request Body**: CV Analysis data in JSON format (see example response above)
-
-**Success Response**:
-- **Code**: 200 OK
-- **Content**: `{ "success": true, "message": "CV analysis saved successfully" }`
-
-**Error Response**:
-- **Code**: 400 Bad Request
-- **Content**: `{ "message": "Invalid CV analysis data" }`
-
-### Job Recommendations
-
-#### Get Job Recommendations
-
-Retrieves job recommendations based on the user's profile data.
-
-- **URL**: `/api/recommendations/jobs/{userId}`
-- **Method**: `GET`
-- **URL Parameters**:
-  - `userId`: ID of the user
-
-**Success Response**:
-- **Code**: 200 OK
-- **Content Example**:
+#### Login
+- **POST** `/api/auth/login`
+- Request body:
 ```json
 {
-  "recommendations": [
-    {
-      "jobTitle": "Senior Software Engineer",
-      "company": "Tech Innovations Inc",
-      "description": "Looking for an experienced software engineer to join our team...",
-      "matchScore": 0.85
-    },
-    {
-      "jobTitle": "Full Stack Developer",
-      "company": "Digital Solutions",
-      "description": "Seeking a full stack developer with experience in .NET and React...",
-      "matchScore": 0.78
-    }
-  ]
+  "email": "user@example.com",
+  "password": "string"
 }
 ```
+- Success: `200 OK` `{ "Token": "..." }`
+- Error: `400 Bad Request` `{ "Error": "..." }`
 
-**Error Response**:
-- **Code**: 404 Not Found
-- **Content**: `{ "message": "User data not found" }`
+### User Profiles
+#### Get Profile
+- **GET** `/api/profiles/{id}`
+- Success: `200 OK` — User profile object
+- Error: `404 Not Found` `{ "Error": "Profile not found or database error occurred" }`
 
-### Skill Recommendations
+#### Update Profile
+- **PUT** `/api/profiles/{id}`
+- Request body: `UpdateUserProfileDto`
+- Success: `200 OK` — Updated profile object
+- Error: `500 Internal Server Error` `{ "Error": "..." }`
 
-#### Get Skill Recommendations
+#### Delete Profile
+- **DELETE** `/api/profiles/{id}`
+- Success: `204 No Content`
+- Error: `500 Internal Server Error` `{ "Error": "..." }`
 
-Retrieves skill-based job recommendations by matching user skills with job descriptions.
+### Companies
+#### Get All Companies
+- **GET** `/api/companies`
+- Success: `200 OK` — Array of companies
 
-- **URL**: `/api/recommendations/skills/{userId}`
-- **Method**: `GET`
-- **URL Parameters**:
-  - `userId`: ID of the user
+#### Get Company by ID
+- **GET** `/api/companies/{id}`
+- Success: `200 OK` — Company object
+- Error: `404 Not Found` `{ "Error": "Company with ID {id} not found" }`
 
-**Success Response**:
-- **Code**: 200 OK
-- **Content Example**:
-```json
-{
-  "recommendations": [
-    {
-      "job_title": "Full Stack Developer",
-      "similarity_score": 0.89
-    },
-    {
-      "job_title": "Backend Engineer",
-      "similarity_score": 0.75
-    },
-    {
-      "job_title": "Software Architect",
-      "similarity_score": 0.68
-    }
-  ]
-}
-```
+#### Create/Update/Delete Company
+- **POST/PUT/DELETE** — Not yet implemented, returns `501 Not Implemented`
 
-**Error Response**:
-- **Code**: 404 Not Found
-- **Content**: `{ "message": "User skills data not found" }`
+#### Get Company Jobs
+- **GET** `/api/companies/{id}/jobs`
+- Success: `200 OK` — Array of jobs for the company
 
-## Integration with External API
+### Job Applications
+#### Get by ID
+- **GET** `/api/jobapplication/{id}`
+- Success: `200 OK` — Job application object
+- Error: `404 Not Found`
 
-The recommendation endpoints connect to an external AI recommender system API:
+#### Get by User
+- **GET** `/api/jobapplication/user?id={userId}`
+- Success: `200 OK` — Array of job applications
 
-- Job Recommendations: Calls the `/recommend` endpoint
-- Skill Recommendations: Calls the `/recomendersystem` endpoint
+#### Get All
+- **GET** `/api/jobapplication/jobs`
+- Success: `200 OK` — Array of job applications
 
-The external API processes the user's profile data and returns relevant job matches based on skills, work experience, and projects.
+### AI & CV Analysis
+#### Save Extracted Data
+- **POST** `/api/ai/extract`
+- Request body: `CVAnalysisDto`
+- Success: `200 OK` `{ "message": "CV analysis data saved successfully" }`
+- Error: `400 Bad Request` or `500 Internal Server Error`
+
+#### Get CV Analysis by Email
+- **GET** `/api/ai/analysis/{email}`
+- Success: `200 OK` — CV analysis object
+- Error: `404 Not Found` or `500 Internal Server Error`
+
+#### Recommend Jobs
+- **POST** `/api/ai/recommend/{userId}`
+- Success: `200 OK` — Recommendation response
+- Error: `500 Internal Server Error`
+
+#### Recommender System
+- **POST** `/api/ai/recommenderSystem/{userId}`
+- Success: `200 OK` — Recommendation response
+- Error: `500 Internal Server Error`
 
 ## Error Handling
-
 All endpoints return appropriate HTTP status codes:
-
 - `200 OK`: The request was successful
-- `400 Bad Request`: The request was invalid or could not be processed
+- `201 Created`: Resource created
+- `204 No Content`: Resource deleted
+- `400 Bad Request`: The request was invalid
 - `401 Unauthorized`: Authentication failure
+- `403 Forbidden`: Not allowed
 - `404 Not Found`: The requested resource was not found
-- `422 Unprocessable Entity`: The request was well-formed but could not be processed due to semantic errors
 - `500 Internal Server Error`: An unexpected server error occurred
+- `501 Not Implemented`: Endpoint not implemented
 
 Error responses include a message explaining the issue.
 
-## Request Format Examples
-
-### Job Recommendation Request
-
-```json
-{
-  "skills": [
-    {
-      "skillName": "C#",
-      "proficiencyLevel": "Expert"
-    }
-  ],
-  "work_experience": [
-    {
-      "jobTitle": "Full Stack Developer",
-      "jobLevel": "Senior",
-      "company": "Tech Corp",
-      "startYear": 2020,
-      "startMonth": 5,
-      "endYear": 2023,
-      "endMonth": 6,
-      "jobDescription": "Full stack .NET developer responsible for all products"
-    }
-  ],
-  "projects": [
-    {
-      "projectName": "Chat Application",
-      "startDate": "2022-01-01T00:00:00",
-      "endDate": "2022-06-30T00:00:00",
-      "url": "github.com/username/chatapp",
-      "description": "Full stack chat application with real-time messaging"
-    }
-  ],
-  "user_skills": [
-    {
-      "skillName": "C#",
-      "proficiencyLevel": "Expert"
-    }
-  ],
-  "job_descriptions": [
-    "Full stack .NET developer responsible for all products"
-  ]
-}
-```
-
-### Skill Recommendation Request
-
-```json
-{
-  "user_skills": "C#, JavaScript, React, .NET Core, SQL",
-  "job_descriptions": [
-    {
-      "title": "Full Stack Developer",
-      "description": "We are looking for a full stack developer with experience in .NET Core, React, and SQL"
-    },
-    {
-      "title": "Backend Engineer",
-      "description": "Seeking experienced C# developer for backend systems development"
-    }
-  ]
-}
-``` 
+## Notes
+- Some endpoints (company create/update/delete) are not yet implemented and will return a 501 status.
+- All endpoints requiring authentication expect a JWT token in the `Authorization` header. 

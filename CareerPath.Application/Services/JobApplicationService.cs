@@ -10,29 +10,29 @@ namespace CareerPath.Application.Services
 {
     public class JobApplicationService : IJobApplicationService
     {
-        private readonly IJobApplicationRepository _repository;
+        private readonly IUnitOfWork _unitOfWork;
         private readonly IMapper _mapper;
 
-        public JobApplicationService(IJobApplicationRepository repository, IMapper mapper)
+        public JobApplicationService(IUnitOfWork unitOfWork, IMapper mapper)
         {
-            _repository = repository;
+            _unitOfWork = unitOfWork;
             _mapper = mapper;
         }
 
         public async Task<JobApplicationDto> GetByIdAsync(int id)
         {
-            var application = await _repository.GetByIdAsync(id);
+            var application = await _unitOfWork.JobApplications.GetByIdAsync(id);
             return _mapper.Map<JobApplicationDto>(application);
         }
 
         public async Task<IEnumerable<JobApplicationDto>> GetByUserIdAsync(string userId)
         {
-            var applications = await _repository.GetByUserIdAsync(userId);
+            var applications = await _unitOfWork.JobApplications.GetByUserIdAsync(userId);
             return _mapper.Map<IEnumerable<JobApplicationDto>>(applications);
         }
         public async Task<IEnumerable<JobApplicationDto>> GetJobsAsync()
         {
-            var applications = await _repository.GetAllJobsAsync();
+            var applications = await _unitOfWork.JobApplications.GetAllJobsAsync();
             return _mapper.Map<IEnumerable<JobApplicationDto>>(applications);
         }
 

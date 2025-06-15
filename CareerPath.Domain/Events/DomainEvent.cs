@@ -3,7 +3,7 @@ public abstract class DomainEvent : IDomainEvent
 {
     public DateTime OccurredOn { get; private set; }
 
-    public string EventType => throw new NotImplementedException();
+    public string EventType { get; set; }
 
     protected DomainEvent()
     {

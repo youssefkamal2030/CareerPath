@@ -10,12 +10,10 @@ namespace CareerPath.Infrastructure.Repository
     public class CVAnalysisRepository : ICVAnalysisRepository
     {
         private readonly AIDataAnalysisDbContext _context;
-        private readonly IMapper _mapper;
 
-        public CVAnalysisRepository(AIDataAnalysisDbContext context, IMapper mapper)
+        public CVAnalysisRepository(AIDataAnalysisDbContext context)
         {
             _context = context;
-            _mapper = mapper;
         }
 
         public async Task<CVAnalysisDto?> GetCVAnalysisByUserIdAsync(string userId)

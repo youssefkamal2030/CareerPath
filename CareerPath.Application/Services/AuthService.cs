@@ -22,7 +22,7 @@ namespace CareerPath.Application.Services
         private readonly ITokenService _jwtTokenService;
         private readonly EmailSender _emailSender;
         private readonly ILogger<AuthService> _logger;
-        private readonly IUserProfileRepository _userProfileRepository;
+        private readonly IUnitOfWork _unitOfWork;
 
         public AuthService(
             UserManager<ApplicationUser> userManager, 
@@ -30,14 +30,14 @@ namespace CareerPath.Application.Services
             ITokenService tokenService,
             EmailSender emailSender,
             ILogger<AuthService> logger,
-            IUserProfileRepository userProfileRepository)
+            IUnitOfWork unitOfWork)
         {
             _userManager = userManager;
             _signInManager = signInManager;
             _jwtTokenService = tokenService;
             _emailSender = emailSender;
             _logger = logger;
-            _userProfileRepository = userProfileRepository;
+            _unitOfWork = unitOfWork;
         }
 
         public async Task<(string? token, string? errorMessage)> LoginUserAsync(LoginDto user)
@@ -123,7 +123,9 @@ namespace CareerPath.Application.Services
                     var userProfile = new UserProfile(createdUser.Id, username, user.Email);
                     
                     // Save the profile
-                    var createdProfile = await _userProfileRepository.CreateAsync(userProfile);
+                     await _unitOfWork.UserProfiles.AddAsync(userProfile);
+                    await _unitOfWork.CompleteAsync();
+
                     
                     // Update the ApplicationUser with the ProfileID reference
                     createdUser.ProfileID = userProfile.Id;

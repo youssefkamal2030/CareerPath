@@ -15,20 +15,20 @@ namespace CareerPath.Application.Services
 {
     public class CVAnalysisService : ICVAnalysisService
     {
-        private readonly ICVAnalysisRepository _repository;
+        private readonly IUnitOfWork _unitOfWork;
         private readonly IMapper _mapper;
         private readonly HttpClient _httpClient;
         private readonly ILogger<CVAnalysisService> _logger;
         private readonly AITeamApiSettings _aiTeamApiSettings;
 
         public CVAnalysisService(
-            ICVAnalysisRepository repository,
+            IUnitOfWork unitOfWork,
             IMapper mapper,
             ILogger<CVAnalysisService> logger,
             IOptions<ExternalServicesSettings> externalServicesSettings,
             HttpClient httpClient)
         {
-            _repository = repository;
+            _unitOfWork = unitOfWork;
             _mapper = mapper;
             _logger = logger;
             _aiTeamApiSettings = externalServicesSettings.Value.AITeamApi;
@@ -37,19 +37,19 @@ namespace CareerPath.Application.Services
 
         public async Task<CVAnalysisDto?> GetCVAnalysisByUserIdAsync(string userId)
         {
-            return await _repository.GetCVAnalysisByUserIdAsync(userId);
+            return await _unitOfWork.CVAnalysis.GetCVAnalysisByUserIdAsync(userId);
         }
 
         public async Task<bool> SaveCVAnalysisAsync(string userId, CVAnalysisDto cvAnalysis)
         {
-            return await _repository.SaveCVAnalysisAsync(userId, cvAnalysis);
+            return await _unitOfWork.CVAnalysis.SaveCVAnalysisAsync(userId, cvAnalysis);
         }
 
         public async Task<JobRecommendationResponseDto> RecommendJobsAsync(string id)
         {
             try
             {
-                var userData = await _repository.GetUserDataForRecommendationAsync(id);
+                var userData = await _unitOfWork.CVAnalysis.GetUserDataForRecommendationAsync(id);
                 if (userData == null)
                 {
                     _logger.LogError("No user data found for user ID: {UserId}", id);
@@ -104,7 +104,7 @@ namespace CareerPath.Application.Services
         {
             try
             {
-                var userData = await _repository.RecommnderSystem(userId);
+                var userData = await _unitOfWork.CVAnalysis.RecommnderSystem(userId);
                 if (userData == null)
                 {
                     _logger.LogError("No user data found for user ID: {UserId}", userId);

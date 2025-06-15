@@ -14,7 +14,6 @@ using Microsoft.OpenApi.Models;
 using System.Reflection;
 using CareerPath.Infrastructure.Repository;
 using EmailConfigration.EmailConfig;
-using CareerPath.Application.AIDataAnalysis_Interfaces;
 using CareerPath.Application.Configuration;
 using MediatR;
 
@@ -45,7 +44,7 @@ namespace CareerPath
                         maxRetryDelay: TimeSpan.FromSeconds(30),
                         errorNumbersToAdd: null);
                 }));
-                
+            
             builder.Services.AddDefaultIdentity<ApplicationUser>(options =>
             {
                 options.Password.RequireDigit = true;
@@ -160,12 +159,12 @@ namespace CareerPath
 
             builder.Services.AddControllers().AddJsonOptions(options => 
             {
-                options.JsonSerializerOptions.ReferenceHandler = System.Text.Json.Serialization.ReferenceHandler.Preserve;
+                options.JsonSerializerOptions.ReferenceHandler = null;
                 options.JsonSerializerOptions.DefaultIgnoreCondition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull;
             });
 
             // Register UnitOfWork
-            builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
+            builder.Services.AddScoped<Application.Interfaces.IUnitOfWork, UnitOfWork>();
 
             // Register MediatR
             builder.Services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(typeof(UserProfileService).Assembly));
@@ -177,6 +176,7 @@ namespace CareerPath
             builder.Services.AddScoped<IUserProfileService, UserProfileService>();
             builder.Services.AddScoped<IEmailService, SmtpEmailService>();
             builder.Services.AddScoped<EmailSender>();
+            builder.Services.AddScoped<IJobRepository, JobRepository>();
             builder.Services.AddScoped<IJobsService, JobsService>();
             builder.Services.AddScoped<JobNotificationService>();
             builder.Services.AddScoped<ICVAnalysisService, CVAnalysisService>();

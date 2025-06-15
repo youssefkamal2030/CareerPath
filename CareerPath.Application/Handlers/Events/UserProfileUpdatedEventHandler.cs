@@ -20,8 +20,7 @@ namespace CareerPath.Application.Handlers.Events
 
         public async Task Handle(UserProfileUpdatedEvent notification, CancellationToken cancellationToken)
         {
-            // In a real application, you would use a more robust mapping solution like AutoMapper.
-            // For now, we'll do a simple manual mapping.
+            
 
             var candidate = await _unitOfWork.AIDataAnalysis_Candidate.GetByIdAsync(notification.UserId);
             if (candidate == null)
@@ -43,10 +42,10 @@ namespace CareerPath.Application.Handlers.Events
 
 
             // This is a simplified skill handling. You might need more complex logic.
-            var skills = notification.Skills.Select(s => new Skill { Name = s, CandidateId = notification.UserId }).ToList();
+            var skills = notification.Skills.Select(s => new Skill { SkillName = s, UserId = notification.UserId }).ToList();
             
             // Clear existing skills and add new ones
-            var existingSkills = await _unitOfWork.AIDataAnalysis_Skill.FindAsync(s => s.CandidateId == notification.UserId);
+            var existingSkills = await _unitOfWork.AIDataAnalysis_Skill.FindAsync(s => s.UserId == notification.UserId);
             _unitOfWork.AIDataAnalysis_Skill.RemoveRange(existingSkills);
             await _unitOfWork.AIDataAnalysis_Skill.AddRangeAsync(skills);
 

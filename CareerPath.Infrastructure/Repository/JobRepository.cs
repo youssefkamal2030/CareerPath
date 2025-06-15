@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using CareerPath.Application.AIDataAnalysis_Interfaces;
 using CareerPath.Domain.Entities.AIDataAnalysis;
 using CareerPath.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
@@ -10,7 +9,7 @@ using Microsoft.Extensions.Logging;
 
 namespace CareerPath.Infrastructure.Repository
 {
-    public class JobRepository : IJobsRepository
+    public class JobRepository : IJobRepository
     {
         private readonly AIDataAnalysisDbContext _context;
         private readonly ILogger<JobRepository> _logger;

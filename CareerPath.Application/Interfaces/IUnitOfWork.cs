@@ -1,14 +1,16 @@
 ﻿using CareerPath.Domain.Entities.AIDataAnalysis;
 using System;
 using System.Threading.Tasks;
-
+using CareerPath.Application.Interfaces;
+using CareerPath.Infrastructure.Repository;
 namespace CareerPath.Application.Interfaces
 {
     public interface IUnitOfWork : IDisposable
     {
         IUserProfileRepository UserProfiles { get; }
         ICompanyRepository Companies { get; }
-        IJobRepository Jobs { get; }
+        IJobRepository jobs { get; }
+
         IJobApplicationRepository JobApplications { get; }
         ICVAnalysisRepository CVAnalysis { get; }
 

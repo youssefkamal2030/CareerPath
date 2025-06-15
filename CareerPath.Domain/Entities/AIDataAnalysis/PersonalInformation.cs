@@ -31,5 +31,7 @@ namespace CareerPath.Domain.Entities.AIDataAnalysis
         public ICollection<WorkExperience>? WorkExperiences { get; set; }
         public ICollection<Education>? Educations { get; set; }
         public ICollection<Project>? Projects { get; set; }
+        public string FirstName { get; set; }
+        public string LastName { get; set; }
     }
 } 

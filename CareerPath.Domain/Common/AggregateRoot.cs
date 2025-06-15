@@ -1,3 +1,5 @@
+using CareerPath.Domain.Events;
+
 public abstract class AggregateRoot
 {
     private readonly List<IDomainEvent> _domainEvents = new();

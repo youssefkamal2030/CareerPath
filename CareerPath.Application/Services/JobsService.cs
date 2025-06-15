@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using AutoMapper;
-using CareerPath.Application.AIDataAnalysis_Interfaces;
 using CareerPath.Application.Interfaces;
 using CareerPath.Contracts.Dto;
 using CareerPath.Domain.Entities.AIDataAnalysis;
@@ -12,13 +11,13 @@ namespace CareerPath.Application.Services
 {
     public class JobsService : IJobsService
     {
-        private readonly IJobsRepository _jobsRepository;
+        private readonly IUnitOfWork _unitOfWork;
         private readonly IMapper _mapper;
         private readonly ILogger<JobsService> _logger;
 
-        public JobsService(IJobsRepository jobsRepository, IMapper mapper, ILogger<JobsService> logger)
+        public JobsService(IUnitOfWork unitOfWork, IMapper mapper, ILogger<JobsService> logger)
         {
-            _jobsRepository = jobsRepository ?? throw new ArgumentNullException(nameof(jobsRepository));
+            _unitOfWork = unitOfWork ?? throw new ArgumentNullException(nameof(unitOfWork));
             _mapper = mapper ?? throw new ArgumentNullException(nameof(mapper));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
@@ -28,7 +27,7 @@ namespace CareerPath.Application.Services
         {
             try
             {
-                var jobs = await _jobsRepository.GetAllAsync();
+                var jobs = await _unitOfWork.jobs.GetAllAsync();
                 _logger.LogInformation("Retrieved all jobs");
                 return _mapper.Map<IEnumerable<JobDto>>(jobs);
             }
@@ -48,7 +47,7 @@ namespace CareerPath.Application.Services
                     throw new ArgumentException("Job ID cannot be null or empty", nameof(id));
                 }
 
-                var job = await _jobsRepository.GetByIdAsync(id);
+                var job = await _unitOfWork.jobs.GetByIdAsync(id);
                 
                 if (job == null)
                 {
@@ -74,7 +73,7 @@ namespace CareerPath.Application.Services
                     throw new ArgumentException("User ID cannot be null or empty", nameof(userId));
                 }
 
-                var jobs = await _jobsRepository.GetByUserIdAsync(userId);
+                var jobs = await _unitOfWork.jobs.GetByUserIdAsync(userId);  
                 _logger.LogInformation("Retrieved jobs for user {UserId}", userId);
                 return _mapper.Map<IEnumerable<JobDto>>(jobs);
             }
