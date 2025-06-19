@@ -205,7 +205,7 @@ namespace CareerPath
             //  authentication middleware
             app.UseAuthentication();
             app.UseAuthorization();
-
+            app.UseHttpsRedirection();
             app.MapControllers();
 
             app.Run();
