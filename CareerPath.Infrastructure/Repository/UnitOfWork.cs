@@ -1,6 +1,9 @@
 using CareerPath.Application.Interfaces;
 using CareerPath.Infrastructure.Data;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Storage;
 using Microsoft.Extensions.Logging;
+using System.Data;
 using System.Threading.Tasks;
 
 namespace CareerPath.Infrastructure.Repository
@@ -55,7 +58,15 @@ namespace CareerPath.Infrastructure.Repository
         {
             return await _aiContext.SaveChangesAsync();
         }
+        public async Task<IDbContextTransaction> BeginTransactionAsync()
+        {
+            return await _context.Database.BeginTransactionAsync();
+        }
 
+        public async Task<IDbContextTransaction> BeginTransactionAsync(IsolationLevel isolationLevel)
+        {
+            return await _context.Database.BeginTransactionAsync(isolationLevel, default);
+        }
         public void Dispose()
         {
             _context.Dispose();

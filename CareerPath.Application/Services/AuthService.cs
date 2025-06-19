@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -81,7 +81,7 @@ namespace CareerPath.Application.Services
             }
             catch (Exception ex)
             {
-                // Log the exception details for debugging
+               
                 Console.WriteLine($"Error in LoginUserAsync: {ex.Message}");
                 return (null, "An unexpected error occurred. Please try again later.");
             }
@@ -89,6 +89,8 @@ namespace CareerPath.Application.Services
 
         public async Task<(bool success, string? errorMessage)> RegisterUserAsync(RegisterDto user)
         {
+            using var transaction = await _unitOfWork.BeginTransactionAsync();
+
             try
             {
                 var existingEmail = await _userManager.FindByEmailAsync(user.Email);
@@ -97,7 +99,6 @@ namespace CareerPath.Application.Services
                     return (false, "Email already in use");
                 }
 
-                // Create the application user with default ProfileID (empty string)
                 var newUser = new ApplicationUser(user.Email, user.Password, user.Username);
                 var result = await _userManager.CreateAsync(newUser, user.Password);
 
@@ -107,70 +108,50 @@ namespace CareerPath.Application.Services
                     return (false, errorMessage);
                 }
 
-                // At this point, the user is created with an empty ProfileID
-                try
+                var createdUser = await _userManager.FindByEmailAsync(user.Email);
+                if (createdUser == null)
                 {
-                    // Get the newly created user to ensure we have the correct ID
-                    var createdUser = await _userManager.FindByEmailAsync(user.Email);
-                    if (createdUser == null)
-                    {
-                        return (false, "Failed to retrieve newly created user");
-                    }
-
-                    var username = !string.IsNullOrEmpty(user.Username) ? user.Username : user.Email;
-                    
-                    // Create UserProfile with the same ID as ApplicationUser for direct 1:1 relationship
-                    var userProfile = new UserProfile(createdUser.Id, username, user.Email);
-                    
-                    // Save the profile
-                     await _unitOfWork.UserProfiles.AddAsync(userProfile);
-                    await _unitOfWork.CompleteAsync();
-
-                    
-                    // Update the ApplicationUser with the ProfileID reference
-                    createdUser.ProfileID = userProfile.Id;
-                    createdUser.SetProfile(userProfile);
-                    
-                    await _userManager.UpdateAsync(createdUser);
-                    
-                    return (true, null);
+                    return (false, "Failed to retrieve newly created user");
                 }
-                catch (Exception ex)
+
+                var username = !string.IsNullOrEmpty(user.Username) ? user.Username : user.Email;
+                var userProfile = new UserProfile(createdUser.Id, username, user.Email);
+
+                await _unitOfWork.UserProfiles.AddAsync(userProfile);
+                await _unitOfWork.CompleteAsync();
+
+                createdUser.ProfileID = userProfile.Id;
+                createdUser.SetProfile(userProfile);
+
+                var updateResult = await _userManager.UpdateAsync(createdUser);
+                if (!updateResult.Succeeded)
                 {
-                    // Log any errors with profile creation
-                    Console.WriteLine($"Error creating profile: {ex.Message}");
-                    
-                    // Try to clean up the user if profile creation failed
-                    try
-                    {
-                        var createdUser = await _userManager.FindByEmailAsync(user.Email);
-                        if (createdUser != null)
-                        {
-                            await _userManager.DeleteAsync(createdUser);
-                        }
-                    }
-                    catch { /* Ignore cleanup errors */ }
-                    
-                    return (false, "Error creating user profile. Please try again.");
+                    var errorMessage = string.Join(", ", updateResult.Errors.Select(e => e.Description));
+                    return (false, $"Failed to update user: {errorMessage}");
                 }
+
+                await transaction.CommitAsync();
+                return (true, null);
             }
             catch (SqlException ex)
             {
                 Console.WriteLine($"SQL error in RegisterUserAsync: {ex.Message}");
+                await transaction.RollbackAsync();
                 return (false, "Database connection error. Please try again later.");
             }
             catch (DbUpdateException ex)
             {
                 Console.WriteLine($"DB Update error in RegisterUserAsync: {ex.Message}");
+                await transaction.RollbackAsync();
                 return (false, "Database error. Please try again later.");
             }
             catch (Exception ex)
             {
                 Console.WriteLine($"Error in RegisterUserAsync: {ex.Message}");
+                await transaction.RollbackAsync();
                 return (false, "An unexpected error occurred. Please try again later.");
             }
         }
-
         public async Task<(bool success, string? errorMessage)> ForgotPasswordAsync(ForgotPasswordDto forgotPasswordDto)
         {
             try

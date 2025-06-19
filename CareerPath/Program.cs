@@ -26,13 +26,13 @@ namespace CareerPath
             var builder = WebApplication.CreateBuilder(args);
 
             builder.Services.AddDbContext<ApplicationDbContext>(options =>
-                options.UseSqlServer(builder.Configuration.GetConnectionString("localConnection"),
+                options.UseSqlServer(builder.Configuration.GetConnectionString("RemoteConnection"),
                 sqlServerOptionsAction: sqlOptions => 
                 {
-                    sqlOptions.EnableRetryOnFailure(
-                        maxRetryCount: 5,
-                        maxRetryDelay: TimeSpan.FromSeconds(30),
-                        errorNumbersToAdd: null);
+                    //sqlOptions.EnableRetryOnFailure(
+                    //    maxRetryCount: 5,
+                    //    maxRetryDelay: TimeSpan.FromSeconds(30),
+                    //    errorNumbersToAdd: null);
                 }));
                 
             builder.Services.AddDbContext<AIDataAnalysisDbContext>(options =>

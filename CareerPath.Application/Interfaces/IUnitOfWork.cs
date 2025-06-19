@@ -3,6 +3,8 @@ using System;
 using System.Threading.Tasks;
 using CareerPath.Application.Interfaces;
 using CareerPath.Infrastructure.Repository;
+using Microsoft.EntityFrameworkCore.Storage;
+using System.Data;
 namespace CareerPath.Application.Interfaces
 {
     public interface IUnitOfWork : IDisposable
@@ -23,5 +25,7 @@ namespace CareerPath.Application.Interfaces
 
         Task<int> CompleteAsync();
         Task<int> CompleteAsyncAi();
+        Task<IDbContextTransaction> BeginTransactionAsync();
+        Task<IDbContextTransaction> BeginTransactionAsync(IsolationLevel isolationLevel);
     }
 }
