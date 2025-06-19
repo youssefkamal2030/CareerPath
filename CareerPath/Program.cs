@@ -194,20 +194,17 @@ namespace CareerPath
                     options.OAuthUsePkce();
                 });
             }
-            else
-            {
-                app.UseExceptionHandler("/Home/Error");
-                app.UseHsts();
-            }
+           
 
             app.UseCors("AllowAll");
             
-            //  authentication middleware
+           
             app.UseAuthentication();
             app.UseAuthorization();
-            app.UseHttpsRedirection();
             app.MapControllers();
-
+            var port = Environment.GetEnvironmentVariable("PORT") ?? "8080";
+            app.Urls.Add($"http://0.0.0.0:{port}");
+            app.Run();
             app.Run();
         }
 
