@@ -16,6 +16,7 @@ using CareerPath.Infrastructure.Repository;
 using EmailConfigration.EmailConfig;
 using CareerPath.Application.Configuration;
 using MediatR;
+using Microsoft.AspNetCore.HttpOverrides;
 
 namespace CareerPath
 {
@@ -182,6 +183,13 @@ namespace CareerPath
             builder.Services.AddScoped<ICVAnalysisService, CVAnalysisService>();
             builder.Services.AddScoped<ICompanyService, CompanyService>();
             builder.Services.AddScoped<IJobApplicationService, JobApplicationService>();
+
+            builder.Services.Configure<ForwardedHeadersOptions>(options =>
+            {
+                options.ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto;
+                options.KnownNetworks.Clear(); // Allow all networks (Railway proxy)
+                options.KnownProxies.Clear();  // Allow all proxies
+            });
 
             var app = builder.Build();
             if(app.Environment.IsDevelopment())
