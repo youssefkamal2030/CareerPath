@@ -3,6 +3,7 @@ using CareerPath.Application.Interfaces;
 using CareerPath.Contracts.Dto;
 using CareerPath.Domain.Entities.AIDataAnalysis;
 using CareerPath.Infrastructure.Data;
+using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 
 namespace CareerPath.Infrastructure.Repository
@@ -162,8 +163,6 @@ namespace CareerPath.Infrastructure.Repository
                 Skills = skillDtos,
                 WorkExperiences = workExperienceDtos,
                 Projects = projectDtos,
-                UserSkills = skillDtos, // Use the same skills for user_skills
-                JobDescriptions = jobDescriptions
             };
         }
      
@@ -211,6 +210,52 @@ namespace CareerPath.Infrastructure.Repository
                 JobDescriptions = jobDescriptionsList
             };
         }
+         public async Task<(byte[] FileData, string FileName, string ContentType)?> GetUserCVAsync(string userId)
+        {
+            var userCV = await _context.userCVs
+                .FirstOrDefaultAsync(cv => cv.UserId == userId);
+
+            if (userCV == null)
+                return null;
+
+            return (userCV.FileData, userCV.FileName, userCV.ContentType);
+        }
+        public async Task<UserCV> SaveUserCV(IFormFile UserCv, string userId)
+        {
+            try
+            {
+                if (UserCv == null || UserCv.Length == 0)
+                    throw new ArgumentException("No file was uploaded");
+
+                if (!UserCv.ContentType.Equals("application/pdf", StringComparison.OrdinalIgnoreCase))
+                    throw new ArgumentException("File must be a PDF");
+
+                using var memoryStream = new MemoryStream();
+                await UserCv.CopyToAsync(memoryStream);
+                var pdfBytes = memoryStream.ToArray();
+
+                var userCV = new UserCV
+                {
+                    Id = Guid.NewGuid(),
+                    UserId = userId,
+                    FileName = UserCv.FileName,
+                    ContentType = UserCv.ContentType,
+                    FileData = pdfBytes,
+                    UploadDate = DateTime.UtcNow
+                };
+
+                _context.userCVs.Add(userCV);
+                await _context.SaveChangesAsync();
+
+                return userCV;
+            }
+            catch (Exception ex)
+            {
+                throw new Exception($"Error saving CV: {ex.Message}", ex);
+            }
+        }
+
+      
     }
 
-} 
+}

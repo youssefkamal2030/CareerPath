@@ -11,6 +11,8 @@ using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Net;
 using System.Text;
+using CareerPath.Domain.Entities.AIDataAnalysis;
+using Microsoft.AspNetCore.Http;
 namespace CareerPath.Application.Services
 {
     public class CVAnalysisService : ICVAnalysisService
@@ -56,11 +58,10 @@ namespace CareerPath.Application.Services
                     throw new Exception($"No user data found for user ID: {id}");
                 }
 
-                _logger.LogInformation("User data for recommendation: Skills: {SkillsCount}, Work Experiences: {WorkExpCount}, Projects: {ProjectsCount}, Job Descriptions: {JobDescCount}",
+                _logger.LogInformation("User data for recommendation: Skills: {SkillsCount}, Work Experiences: {WorkExpCount}, Projects: {ProjectsCount}",
                     userData.Skills?.Count ?? 0,
                     userData.WorkExperiences?.Count ?? 0,
-                    userData.Projects?.Count ?? 0,
-                    userData.JobDescriptions?.Count ?? 0);
+                    userData.Projects?.Count ?? 0);
 
                 var request = new HttpRequestMessage(HttpMethod.Post, "https://ocelot-delicate-logically.ngrok-free.app/recommend");
                 request.Headers.Accept.Clear();
@@ -152,5 +153,6 @@ namespace CareerPath.Application.Services
                 throw;
             }
         }
+      
     }
 }

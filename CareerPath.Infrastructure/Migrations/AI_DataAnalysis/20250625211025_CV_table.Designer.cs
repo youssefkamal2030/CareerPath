@@ -4,6 +4,7 @@ using CareerPath.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace CareerPath.Infrastructure.Migrations.AI_DataAnalysis
 {
     [DbContext(typeof(AIDataAnalysisDbContext))]
-    partial class AIDataAnalysisDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250625211025_CV_table")]
+    partial class CV_table
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

@@ -88,13 +88,13 @@ namespace CareerPath.Api.Controllers
             }
         }
 
-   
+
         [HttpPost("recommend/{userId}")]
         public async Task<IActionResult> RecommendJobsById(string userId)
         {
             try
             {
-                var response =await _cvAnalysisService.RecommendJobsAsync(userId);
+                var response = await _cvAnalysisService.RecommendJobsAsync(userId);
                 _logger.LogInformation("Recommended jobs for user {UserId}", userId);
                 _logger.LogInformation("Response: {Response}", response);
                 return Ok(response);
@@ -121,6 +121,11 @@ namespace CareerPath.Api.Controllers
                 return StatusCode(500, "An error occurred while processing your request");
             }
         }
+        //[HttpPost("CV /{userId}")]
+        //public async Task<IActionResult> UserCV([FromBody] CV cv)
+        //{
+
+        //}
 
     }
 }

@@ -13,5 +13,6 @@ namespace CareerPath.Application.Interfaces
         Task<bool> SaveCVAnalysisAsync(string userId, CVAnalysisDto cvAnalysis);
         Task<JobRecommendationResponseDto> RecommendJobsAsync(string id);
         Task<SkillRecommendationResponseDto> RecommnderSystem(string userId);
+
     }
 }

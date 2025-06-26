@@ -9,15 +9,16 @@ namespace CareerPath.Application.Profiles
     {
         public UserProfileMapping()
         {
-            CreateMap<UserProfile, UserProfileDto>()
-                .ForMember(dest => dest.FullName, 
-                    opt => opt.MapFrom(src => src.FullName))
-                .ForMember(dest => dest.Username,
-                    opt => opt.MapFrom(src => src.Username))
-                .ForMember(dest => dest.Email,
-                    opt => opt.MapFrom(src => src.Email))
-                .ForMember(dest => dest.Skills,
-                    opt => opt.MapFrom(src => src.Skills != null ? new List<string>(src.Skills) : new List<string>()));
+            
+     CreateMap<UserProfile, UserProfileDto>()
+    .ForMember(dest => dest.Bio, opt => opt.MapFrom(src => src.Bio ?? string.Empty))
+    .ForMember(dest => dest.Location, opt => opt.MapFrom(src => src.Location ?? string.Empty))
+    .ForMember(dest => dest.CoverUrl, opt => opt.MapFrom(src => src.CoverUrl ?? string.Empty))
+    .ForMember(dest => dest.JobTitle, opt => opt.MapFrom(src => src.JobTitle ?? string.Empty))
+    .ForMember(dest => dest.AvatarUrl, opt => opt.MapFrom(src => src.AvatarUrl ?? string.Empty))
+    .ForMember(dest => dest.FullName, opt => opt.MapFrom(src => src.FullName ?? string.Empty))
+    .ForMember(dest => dest.Skills, opt => opt.MapFrom(src => src.Skills ?? new List<string>()));
+
 
             CreateMap<CreateUserProfileDto, UserProfile>()
                 .ConstructUsing((src, ctx) => new UserProfile(

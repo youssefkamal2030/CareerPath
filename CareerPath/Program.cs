@@ -27,7 +27,7 @@ namespace CareerPath
             var builder = WebApplication.CreateBuilder(args);
 
             builder.Services.AddDbContext<ApplicationDbContext>(options =>
-                options.UseSqlServer(builder.Configuration.GetConnectionString("RemoteConnection"),
+                options.UseSqlServer(builder.Configuration.GetConnectionString("localConnection"),
                 sqlServerOptionsAction: sqlOptions => 
                 {
                     //sqlOptions.EnableRetryOnFailure(
@@ -184,12 +184,7 @@ namespace CareerPath
             builder.Services.AddScoped<ICompanyService, CompanyService>();
             builder.Services.AddScoped<IJobApplicationService, JobApplicationService>();
 
-            builder.Services.Configure<ForwardedHeadersOptions>(options =>
-            {
-                options.ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto;
-                options.KnownNetworks.Clear(); // Allow all networks (Railway proxy)
-                options.KnownProxies.Clear();  // Allow all proxies
-            });
+          
 
             var app = builder.Build();
             if(app.Environment.IsDevelopment())

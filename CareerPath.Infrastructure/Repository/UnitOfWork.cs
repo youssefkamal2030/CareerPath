@@ -58,9 +58,13 @@ namespace CareerPath.Infrastructure.Repository
         {
             return await _aiContext.SaveChangesAsync();
         }
-        public async Task<IDbContextTransaction> BeginTransactionAsync()
+        public async Task<IDbContextTransaction> MainDatabaseBeginTransactionAsync()
         {
             return await _context.Database.BeginTransactionAsync();
+        }
+        public async Task<IDbContextTransaction> AiDatabaseBeginTransactionAsync()
+        {
+            return await _aiContext.Database.BeginTransactionAsync();
         }
 
         public async Task<IDbContextTransaction> BeginTransactionAsync(IsolationLevel isolationLevel)

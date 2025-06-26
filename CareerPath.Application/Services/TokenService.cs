@@ -24,17 +24,14 @@ namespace CareerPath.Application.Services
             _audience = configuration["Jwt:Audience"];
         }
         
-        // Helper method to get the key as a byte array, properly handling base64 encoding
         private byte[] GetSecretKeyBytes()
         {
-            // First try to decode the key as base64
             try
             {
                 return Convert.FromBase64String(_secretKey);
             }
             catch (FormatException)
             {
-                // If it's not a valid base64 string, encode it to base64 first, then decode
                 string base64Secret = Convert.ToBase64String(Encoding.UTF8.GetBytes(_secretKey));
                 return Convert.FromBase64String(base64Secret);
             }
@@ -81,7 +78,7 @@ namespace CareerPath.Application.Services
                     ValidateAudience = true,
                     ValidAudience = _audience,
                     ValidateLifetime = true,
-                    ClockSkew = TimeSpan.Zero // Reduce the default 5-minute clock skew to zero
+                    ClockSkew = TimeSpan.Zero 
                 }, out var validatedToken);
 
                 return principal;

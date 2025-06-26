@@ -25,7 +25,8 @@ namespace CareerPath.Application.Interfaces
 
         Task<int> CompleteAsync();
         Task<int> CompleteAsyncAi();
-        Task<IDbContextTransaction> BeginTransactionAsync();
+        Task<IDbContextTransaction> MainDatabaseBeginTransactionAsync();
+        Task<IDbContextTransaction> AiDatabaseBeginTransactionAsync();
         Task<IDbContextTransaction> BeginTransactionAsync(IsolationLevel isolationLevel);
     }
 }

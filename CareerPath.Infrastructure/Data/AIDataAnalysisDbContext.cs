@@ -20,7 +20,7 @@ namespace CareerPath.Infrastructure.Data
         public DbSet<WorkExperience> WorkExperiences { get; set; }
         public DbSet<Education> Educations { get; set; }
         public DbSet<Project> Projects { get; set; }
-
+        public DbSet<UserCV> userCVs { get; set; }
         protected override void OnModelCreating(ModelBuilder builder)
         {
             base.OnModelCreating(builder);

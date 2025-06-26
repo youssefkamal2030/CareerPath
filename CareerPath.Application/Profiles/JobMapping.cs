@@ -9,7 +9,6 @@ namespace CareerPath.Application.Profiles
     {
         public JobMapping()
         {
-            // Map from Job entity to JobDto (for reading)
             CreateMap<Job, JobDto>();
 
         }

@@ -89,7 +89,8 @@ namespace CareerPath.Application.Services
 
         public async Task<(bool success, string? errorMessage)> RegisterUserAsync(RegisterDto user)
         {
-            using var transaction = await _unitOfWork.BeginTransactionAsync();
+            using var transaction = await _unitOfWork.MainDatabaseBeginTransactionAsync();
+            using var Ai_transaction = await _unitOfWork.AiDatabaseBeginTransactionAsync();
 
             try
             {

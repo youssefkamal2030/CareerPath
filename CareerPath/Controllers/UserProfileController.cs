@@ -62,7 +62,6 @@ namespace CareerPath.Api.Controllers
             if (string.IsNullOrEmpty(userId))
                 return Unauthorized();
 
-            // Only allow users to update their own profile
             if (id != userId)
                 return Forbid();
 
@@ -80,7 +79,6 @@ namespace CareerPath.Api.Controllers
             if (string.IsNullOrEmpty(userId))
                 return Unauthorized();
 
-            // Only allow users to delete their own profile
             if (id != userId)
                 return Forbid();
 

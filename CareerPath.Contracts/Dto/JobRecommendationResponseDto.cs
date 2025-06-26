@@ -6,24 +6,36 @@ namespace CareerPath.Contracts.Dto
 {
     public class JobRecommendationResponseDto
     {
-        // Add properties that match the response from the API
-        // This is a placeholder - replace with actual response structure
+        
         [JsonPropertyName("recommendations")]
         public List<JobRecommendationDto> Recommendations { get; set; }
     }
 
     public class JobRecommendationDto
     {
-        [JsonPropertyName("jobTitle")]
-        public string JobTitle { get; set; }
-        
-        [JsonPropertyName("company")]
-        public string Company { get; set; }
-        
-        [JsonPropertyName("description")]
-        public string Description { get; set; }
-        
-        [JsonPropertyName("matchScore")]
-        public double MatchScore { get; set; }
+
+        public string job_title { get; set; }
+
+
+        public string job_level { get; set; }
+
+        public List<Strength> strengths_points { get; set; }
+        public List<Weakness> weakness_points { get; set; }
+
+        public string reason { get; set; }
     }
-} 
+    public class Strength
+    {
+        public string skill_name { get; set; }
+        public string proficiency_level { get; set; }
+        public string reason { get; set; }
+    }
+    public class Weakness
+    {
+        public string skill_name { get; set; }
+        public string proficiency_level { get; set; }
+        public string required_level { get; set; }
+        public string improvement_tips { get; set; }
+    }
+
+}

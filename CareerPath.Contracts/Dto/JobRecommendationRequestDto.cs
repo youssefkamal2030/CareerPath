@@ -15,10 +15,6 @@ namespace CareerPath.Contracts.Dto
         [JsonPropertyName("projects")]
         public List<ProjectDto> Projects { get; set; }
         
-        [JsonPropertyName("user_skills")]
-        public List<SkillDto> UserSkills { get; set; }
-        
-        [JsonPropertyName("job_descriptions")]
-        public List<string> JobDescriptions { get; set; } = new List<string>();
+     
     }
 } 
