@@ -29,8 +29,9 @@ namespace CareerPath.Api.Controllers
             _mapper = mapper;
         }
 
-
+        //this endpoint is resposable for recieving the data extracted from the AI service 
         [HttpPost("extract")]
+        
         public async Task<IActionResult> SaveExtractedData([FromBody] CVAnalysisDto data)
         {
             try

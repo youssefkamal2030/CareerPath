@@ -37,6 +37,7 @@ namespace CareerPath.Application.Services
             _httpClient = httpClient ?? throw new ArgumentNullException(nameof(httpClient));
         }
 
+        //this method Retrives the data extracted by the AI team for the front-end
         public async Task<CVAnalysisDto?> GetCVAnalysisByUserIdAsync(string userId)
         {
             return await _unitOfWork.CVAnalysis.GetCVAnalysisByUserIdAsync(userId);
@@ -84,8 +85,7 @@ namespace CareerPath.Application.Services
                 if (response.StatusCode == HttpStatusCode.OK)
                 {
                     var recommendations = JsonSerializer.Deserialize<JobRecommendationResponseDto>(result, jsonOptions);
-                    _logger.LogInformation("Received {RecommendationCount} job recommendations for user {UserId}",
-                        recommendations?.Recommendations?.Count ?? 0, id);
+                   
                     return recommendations;
                 }
                 else
@@ -153,6 +153,27 @@ namespace CareerPath.Application.Services
                 throw;
             }
         }
-      
+      public async Task SaveCvFile(IFormFile Cv, string userId)
+        {
+            try
+            {
+                var userCv = await _unitOfWork.CVAnalysis.SaveUserCV(Cv, userId);
+                _logger.LogInformation("Successfully received Cv File for user {UserId}: Cv file --> {Cv}", userId, Cv);
+                if (userCv == null)
+                {
+                    _logger.LogError("Failed to save CV for user {UserId}", userId);
+                    throw new Exception($"Failed to save CV for user ID: {userId}");
+                }
+                else
+                {
+                    _logger.LogInformation("CV saved successfully for user {UserId}", userId);
+                }
+            }
+            catch(Exception ex)
+            {
+                throw new Exception("Failed to save the Cv File ");
+              
+            }
+        }
     }
 }

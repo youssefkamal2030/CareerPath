@@ -6,36 +6,61 @@ namespace CareerPath.Contracts.Dto
 {
     public class JobRecommendationResponseDto
     {
-        
-        [JsonPropertyName("recommendations")]
-        public List<JobRecommendationDto> Recommendations { get; set; }
+        [JsonPropertyName("response")]
+        public JobRecommendationResponse Response { get; set; }
+    }
+
+    public class JobRecommendationResponse
+    {
+        [JsonPropertyName("jobs")]
+        public List<JobRecommendationDto> Jobs { get; set; }
+
+        [JsonPropertyName("reason")]
+        public string Reason { get; set; }
     }
 
     public class JobRecommendationDto
     {
+        [JsonPropertyName("job_title")]
+        public string JobTitle { get; set; }
 
-        public string job_title { get; set; }
+        [JsonPropertyName("job_level")]
+        public string JobLevel { get; set; }
 
+        [JsonPropertyName("strengths_points")]
+        public List<Strength> StrengthsPoints { get; set; }
 
-        public string job_level { get; set; }
+        [JsonPropertyName("weakness_points")]
+        public List<Weakness> WeaknessPoints { get; set; }
 
-        public List<Strength> strengths_points { get; set; }
-        public List<Weakness> weakness_points { get; set; }
-
-        public string reason { get; set; }
+        [JsonPropertyName("reason")]
+        public string Reason { get; set; }
     }
+
     public class Strength
     {
-        public string skill_name { get; set; }
-        public string proficiency_level { get; set; }
-        public string reason { get; set; }
-    }
-    public class Weakness
-    {
-        public string skill_name { get; set; }
-        public string proficiency_level { get; set; }
-        public string required_level { get; set; }
-        public string improvement_tips { get; set; }
+        [JsonPropertyName("skill_name")]
+        public string SkillName { get; set; }
+
+        [JsonPropertyName("proficiency_level")]
+        public string ProficiencyLevel { get; set; }
+
+        [JsonPropertyName("reason")]
+        public string Reason { get; set; }
     }
 
+    public class Weakness
+    {
+        [JsonPropertyName("skill_name")]
+        public string SkillName { get; set; }
+
+        [JsonPropertyName("proficiency_level")]
+        public string ProficiencyLevel { get; set; }
+
+        [JsonPropertyName("required_level")]
+        public string RequiredLevel { get; set; }
+
+        [JsonPropertyName("improvement_tips")]
+        public string ImprovementTips { get; set; }
+    }
 }

@@ -116,6 +116,7 @@ namespace CareerPath.Infrastructure.Repository
             //    return false;
             //}
         }
+        //this method retrives the data for recommending the jobs on the platform
         public async Task<JobRecommendationRequestDto> GetUserDataForRecommendationAsync(string userId)
         {
             var personalinfo = await _context.PersonalInformations
@@ -165,7 +166,7 @@ namespace CareerPath.Infrastructure.Repository
                 Projects = projectDtos,
             };
         }
-     
+     //this method for Recommending the top 5 jobs not related to the data stored 
         public async Task<RecommnderSystemDto> RecommnderSystem(string userId)
         {
             var personalInfo = await _context.PersonalInformations
