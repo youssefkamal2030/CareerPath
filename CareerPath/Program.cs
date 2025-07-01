@@ -37,7 +37,7 @@ namespace CareerPath
                 }));
                 
             builder.Services.AddDbContext<AIDataAnalysisDbContext>(options =>
-                options.UseSqlServer(builder.Configuration.GetConnectionString("AIDataAnalysisConnection"),
+                options.UseSqlServer(builder.Configuration.GetConnectionString("AIDataAnalysisConnection_RemoteConnection"),
                 sqlServerOptionsAction: sqlOptions => 
                 {
                     //sqlOptions.EnableRetryOnFailure(
