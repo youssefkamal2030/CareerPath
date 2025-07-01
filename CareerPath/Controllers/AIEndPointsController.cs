@@ -6,6 +6,8 @@ using CareerPath.Domain.Entities;
 using CareerPath.Application.Interfaces;
 using AutoMapper;
 using static System.Net.Http.HttpClient;
+using Microsoft.AspNetCore.Authorization;
+using System.Security.Claims;
 namespace CareerPath.Api.Controllers
 {
     [ApiController]
@@ -122,11 +124,41 @@ namespace CareerPath.Api.Controllers
                 return StatusCode(500, "An error occurred while processing your request");
             }
         }
-        //[HttpPost("CV /{userId}")]
-        //public async Task<IActionResult> UserCV([FromBody] CV cv)
-        //{
+        [HttpPost("upload")]
+        [Consumes("multipart/form-data")]
+        [Authorize] 
+        public async Task<IActionResult> UploadCV(IFormFile cv)
+        {
+            try
+            {
+                var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
 
-        //}
+                if (string.IsNullOrWhiteSpace(userId))
+                {
+                    return Unauthorized("User not authenticated");
+                }
+
+                var result = await _cvAnalysisService.SaveCvFile(cv, userId);
+
+                return Ok(new
+                {
+                    Message = "CV uploaded successfully",
+                    CvId = result.Id,
+                    FileName = result.FileName,
+                    UploadDate = result.UploadDate
+                });
+            }
+            catch (ArgumentException ex)
+            {
+                _logger.LogWarning("Invalid CV upload request: {Error}", ex.Message);
+                return BadRequest(new { Error = ex.Message });
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Unexpected error during CV upload");
+                return StatusCode(500, new { Error = "An error occurred while processing your request" });
+            }
+        }
 
     }
 }

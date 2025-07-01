@@ -153,27 +153,31 @@ namespace CareerPath.Application.Services
                 throw;
             }
         }
-      public async Task SaveCvFile(IFormFile Cv, string userId)
+     public async Task<UserCV> SaveCvFile(IFormFile cv, string userId)
         {
             try
             {
-                var userCv = await _unitOfWork.CVAnalysis.SaveUserCV(Cv, userId);
-                _logger.LogInformation("Successfully received Cv File for user {UserId}: Cv file --> {Cv}", userId, Cv);
-                if (userCv == null)
-                {
-                    _logger.LogError("Failed to save CV for user {UserId}", userId);
-                    throw new Exception($"Failed to save CV for user ID: {userId}");
-                }
-                else
-                {
-                    _logger.LogInformation("CV saved successfully for user {UserId}", userId);
-                }
+                _logger.LogInformation("Starting CV upload process for user {UserId}. File: {FileName}, Size: {FileSize} bytes",
+                    userId, cv?.FileName, cv?.Length);
+
+                var userCv = await _unitOfWork.CVAnalysis.SaveUserCV(cv, userId);
+
+                _logger.LogInformation("CV uploaded successfully for user {UserId}. CV ID: {CvId}",
+                    userId, userCv.Id);
+
+                return userCv; 
             }
-            catch(Exception ex)
+            catch (ArgumentException ex)
             {
-                throw new Exception("Failed to save the Cv File ");
-              
+                _logger.LogWarning("Invalid CV file upload attempt for user {UserId}: {Error}", userId, ex.Message);
+                throw; 
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Unexpected error occurred while saving CV for user {UserId}", userId);
+                throw new Exception($"Failed to save CV file for user {userId}: {ex.Message}", ex);
             }
         }
+
     }
 }

@@ -4,6 +4,8 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using CareerPath.Contracts.Dto;
+using CareerPath.Domain.Entities.AIDataAnalysis;
+using Microsoft.AspNetCore.Http;
 
 namespace CareerPath.Application.Interfaces
 {
@@ -13,6 +15,8 @@ namespace CareerPath.Application.Interfaces
         Task<bool> SaveCVAnalysisAsync(string userId, CVAnalysisDto cvAnalysis);
         Task<JobRecommendationResponseDto> RecommendJobsAsync(string id);
         Task<SkillRecommendationResponseDto> RecommnderSystem(string userId);
+        Task<UserCV> SaveCvFile(IFormFile Cv, string userId);
+
 
     }
 }
