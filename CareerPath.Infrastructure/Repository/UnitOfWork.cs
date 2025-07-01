@@ -70,6 +70,15 @@ namespace CareerPath.Infrastructure.Repository
         {
             return await _context.Database.BeginTransactionAsync(isolationLevel, default);
         }
+        public async Task SetUserId(string id)
+        {
+            var user = new CareerPath.Domain.Entities.AIDataAnalysis.ApplicationUser
+            {
+                Id = id
+            };
+            
+            _aiContext.ApplicationUser.Add(user);
+        }
         public void Dispose()
         {
             _context.Dispose();

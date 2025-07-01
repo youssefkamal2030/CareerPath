@@ -28,5 +28,6 @@ namespace CareerPath.Application.Interfaces
         Task<IDbContextTransaction> MainDatabaseBeginTransactionAsync();
         Task<IDbContextTransaction> AiDatabaseBeginTransactionAsync();
         Task<IDbContextTransaction> BeginTransactionAsync(IsolationLevel isolationLevel);
+        Task SetUserId(string id);
     }
 }

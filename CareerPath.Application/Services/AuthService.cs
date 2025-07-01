@@ -102,6 +102,9 @@ namespace CareerPath.Application.Services
 
                 var newUser = new ApplicationUser(user.Email, user.Password, user.Username);
                 var result = await _userManager.CreateAsync(newUser, user.Password);
+                await _unitOfWork.SetUserId(newUser.Id);
+                await _unitOfWork.CompleteAsyncAi(); 
+
 
                 if (!result.Succeeded)
                 {
@@ -132,6 +135,7 @@ namespace CareerPath.Application.Services
                 }
 
                 await transaction.CommitAsync();
+                await Ai_transaction.CommitAsync();
                 return (true, null);
             }
             catch (SqlException ex)

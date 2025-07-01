@@ -33,17 +33,17 @@ namespace CareerPath
                     //sqlOptions.EnableRetryOnFailure(
                     //    maxRetryCount: 5,
                     //    maxRetryDelay: TimeSpan.FromSeconds(30),
-                    //    errorNumbersToAdd: null);
+                    //    errorNumbersToAdd: null); ----> commented it because im manging the transactions manually 
                 }));
                 
             builder.Services.AddDbContext<AIDataAnalysisDbContext>(options =>
                 options.UseSqlServer(builder.Configuration.GetConnectionString("AIDataAnalysisConnection"),
                 sqlServerOptionsAction: sqlOptions => 
                 {
-                    sqlOptions.EnableRetryOnFailure(
-                        maxRetryCount: 5,
-                        maxRetryDelay: TimeSpan.FromSeconds(30),
-                        errorNumbersToAdd: null);
+                    //sqlOptions.EnableRetryOnFailure(
+                    //    maxRetryCount: 5,
+                    //    maxRetryDelay: TimeSpan.FromSeconds(30),
+                    //    errorNumbersToAdd: null);----> commented it because im manging the transactions manually 
                 }));
             
             builder.Services.AddDefaultIdentity<ApplicationUser>(options =>
