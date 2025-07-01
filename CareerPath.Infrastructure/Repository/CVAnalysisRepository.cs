@@ -260,7 +260,22 @@ namespace CareerPath.Infrastructure.Repository
                 }
                 else
                 {
-                    return null;
+                    using var memoryStream = new MemoryStream();
+                    await userCv.CopyToAsync(memoryStream);
+
+                    var newUserCV = new UserCV
+                    {
+                        Id = Guid.NewGuid(),
+                        UserId = userId,
+                        FileName = userCv.FileName,
+                        ContentType = userCv.ContentType,
+                        FileData = memoryStream.ToArray(),
+                        UploadDate = DateTime.UtcNow
+                    };
+
+                    _context.userCVs.Add(newUserCV);
+                    await _context.SaveChangesAsync();
+                    return newUserCV;
                 }
             }
             catch (Exception ex) when (!(ex is ArgumentException))
