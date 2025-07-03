@@ -655,3 +655,5 @@ coverage/
 **/appsettings.Development.json
 **/appsettings.local.json
 **/config.local.json
+appsettings.json
+appsettings.Production.json
