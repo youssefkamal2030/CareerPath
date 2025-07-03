@@ -16,7 +16,6 @@ namespace CareerPath.Application.Profiles
     .ForMember(dest => dest.CoverUrl, opt => opt.MapFrom(src => src.CoverUrl ?? string.Empty))
     .ForMember(dest => dest.JobTitle, opt => opt.MapFrom(src => src.JobTitle ?? string.Empty))
     .ForMember(dest => dest.AvatarUrl, opt => opt.MapFrom(src => src.AvatarUrl ?? string.Empty))
-    .ForMember(dest => dest.FullName, opt => opt.MapFrom(src => src.FullName ?? string.Empty))
     .ForMember(dest => dest.Skills, opt => opt.MapFrom(src => src.Skills ?? new List<string>()));
 
 

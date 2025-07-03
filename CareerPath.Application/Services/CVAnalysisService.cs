@@ -179,5 +179,105 @@ namespace CareerPath.Application.Services
             }
         }
 
+        public async Task<(byte[] FileData, string FileName, string ContentType)?> GetUserCVAsync(string userId)
+        {
+            return await _unitOfWork.CVAnalysis.GetUserCVAsync(userId);
+        }
+
+        public async Task<CVAnalysisDto> ExtractCVDataAsync(string userId)
+        {
+            // 1. Retrieve the user's CV
+            var cvResult = await _unitOfWork.CVAnalysis.GetUserCVAsync(userId);
+            if (cvResult == null)
+                throw new Exception("No CV found for this user.");
+
+            var (fileData, fileName, contentType) = cvResult.Value;
+
+            // 2. Prepare the multipart/form-data request with the correct field name and content type
+            using var content = new MultipartFormDataContent();
+            var fileContent = new ByteArrayContent(fileData);
+            fileContent.Headers.ContentType = new System.Net.Http.Headers.MediaTypeHeaderValue("application/pdf");
+            content.Add(fileContent, "resumefile", fileName ?? "cv.pdf");
+
+            // 3. Send to external /extract endpoint
+            var extractUrl = "https://ocelot-delicate-logically.ngrok-free.app/extract"; // TODO: move to config
+            var response = await _httpClient.PostAsync(extractUrl, content);
+            var responseString = await response.Content.ReadAsStringAsync();
+
+            if (!response.IsSuccessStatusCode)
+                throw new Exception($"Extraction failed: {response.StatusCode} - {responseString}");
+
+            // 4. Deserialize and map the response
+            var extractResponse = JsonSerializer.Deserialize<ExternalExtractResponse>(responseString, new JsonSerializerOptions { PropertyNamingPolicy = JsonNamingPolicy.SnakeCaseLower });
+            if (extractResponse == null || extractResponse.Data == null)
+                throw new Exception("Invalid extraction response from external service.");
+
+            // 5. Map extractResponse.Data to CVAnalysisDto
+            var cvAnalysis = MapExtractedDataToCVAnalysisDto(extractResponse.Data);
+            return cvAnalysis;
+        }
+
+        private CVAnalysisDto MapExtractedDataToCVAnalysisDto(ExtractedData data)
+        {
+            return new CVAnalysisDto
+            {
+                PersonalInformation = new PersonalInformationDto
+                {
+                    Name = data.PersonalInformation?.Name,
+                    Email = data.PersonalInformation?.Email,
+                    Phone = data.PersonalInformation?.Phone,
+                    Address = data.PersonalInformation?.Address
+                },
+                Skills = data.Skills?.Select(s => new SkillDto
+                {
+                    SkillName = s.SkillName,
+                    ProficiencyLevel = s.ProficiencyLevel
+                }).ToList() ?? new List<SkillDto>(),
+                WorkExperiences = data.WorkExperiences?.Select(w => new WorkExperienceDto
+                {
+                    JobTitle = w.JobTitle,
+                    JobLevel = w.JobLevel,
+                    Company = w.Company,
+                    StartYear = w.StartYear,
+                    StartMonth = w.StartMonth,
+                    EndYear = w.EndYear,
+                    EndMonth = w.EndMonth,
+                    JobDescription = w.JobDescription
+                }).ToList() ?? new List<WorkExperienceDto>(),
+                Educations = data.Educations?.Select(e => new EducationDto
+                {
+                    Institution = e.Institution,
+                    Degree = e.Degree,
+                    FieldOfStudy = e.FieldOfStudy,
+                    StartYear = e.StartYear,
+                    StartMonth = e.StartMonth,
+                    EndYear = e.EndYear,
+                    EndMonth = e.EndMonth,
+                    EducationLevel = e.EducationLevel
+                }).ToList() ?? new List<EducationDto>(),
+                Projects = data.Projects?.Select(p => new ProjectDto
+                {
+                    ProjectName = p.ProjectName,
+                    StartDate = p.StartDate,
+                    EndDate = p.EndDate,
+                    Url = p.Url,
+                    Description = p.Description
+                }).ToList() ?? new List<ProjectDto>()
+            };
+        }
+
+        private class ExternalExtractResponse
+        {
+            public string Status { get; set; }
+            public ExtractedData Data { get; set; }
+        }
+        private class ExtractedData
+        {
+            public PersonalInformationDto PersonalInformation { get; set; }
+            public List<SkillDto> Skills { get; set; }
+            public List<WorkExperienceDto> WorkExperiences { get; set; }
+            public List<EducationDto> Educations { get; set; }
+            public List<ProjectDto> Projects { get; set; }
+        }
     }
 }

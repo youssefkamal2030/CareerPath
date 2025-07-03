@@ -16,7 +16,7 @@ namespace CareerPath.Application.Interfaces
         Task<JobRecommendationResponseDto> RecommendJobsAsync(string id);
         Task<SkillRecommendationResponseDto> RecommnderSystem(string userId);
         Task<UserCV> SaveCvFile(IFormFile Cv, string userId);
-
-
+        Task<(byte[] FileData, string FileName, string ContentType)?> GetUserCVAsync(string userId);
+        Task<CVAnalysisDto> ExtractCVDataAsync(string userId);
     }
 }

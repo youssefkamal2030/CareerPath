@@ -65,18 +65,19 @@ namespace CareerPath.Api.Controllers
             }
         }
 
-        [HttpGet("analysis/{email}")]
-        public async Task<IActionResult> GetCVAnalysis(string email)
+        [HttpGet("analysis")]
+        [Authorize]
+        public async Task<IActionResult> GetCVAnalysis()
         {
             try
             {
-                var user = await _userManager.FindByEmailAsync(email);
-                if (user == null)
+                var userId = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
+                if (string.IsNullOrWhiteSpace(userId))
                 {
-                    return NotFound($"User with email {email} not found");
+                    return Unauthorized("User not authenticated");
                 }
 
-                var analysis = await _cvAnalysisService.GetCVAnalysisByUserIdAsync(user.Id);
+                var analysis = await _cvAnalysisService.ExtractCVDataAsync(userId);
                 if (analysis == null)
                 {
                     return NotFound("No CV analysis data found for this user");
@@ -86,7 +87,7 @@ namespace CareerPath.Api.Controllers
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error retrieving CV analysis data for user {Email}", email);
+                _logger.LogError(ex, "Error extracting CV analysis data for user {UserId}", User?.Identity?.Name);
                 return StatusCode(500, "An error occurred while processing your request");
             }
         }
@@ -158,6 +159,22 @@ namespace CareerPath.Api.Controllers
                 _logger.LogError(ex, "Unexpected error during CV upload");
                 return StatusCode(500, new { Error = "An error occurred while processing your request" });
             }
+        }
+
+        [HttpGet("download-cv")]
+        [Authorize]
+        public async Task<IActionResult> DownloadCV()
+        {
+            var userId = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
+            if (string.IsNullOrWhiteSpace(userId))
+                return Unauthorized("User not authenticated");
+
+            var cvResult = await _cvAnalysisService.GetUserCVAsync(userId);
+            if (cvResult == null)
+                return NotFound("No CV found for this user.");
+
+            var (fileData, fileName, contentType) = cvResult.Value;
+            return File(fileData, contentType ?? "application/pdf", fileName ?? "cv.pdf");
         }
 
     }
