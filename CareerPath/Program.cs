@@ -27,7 +27,7 @@ namespace CareerPath
             var builder = WebApplication.CreateBuilder(args);
 
             builder.Services.AddDbContext<ApplicationDbContext>(options =>
-                options.UseSqlServer(builder.Configuration.GetConnectionString("localConnection"),
+                options.UseSqlServer(builder.Configuration.GetConnectionString("RemoteConnection"),
                 sqlServerOptionsAction: sqlOptions => 
                 {
                     //sqlOptions.EnableRetryOnFailure(
@@ -37,7 +37,7 @@ namespace CareerPath
                 }));
                 
             builder.Services.AddDbContext<AIDataAnalysisDbContext>(options =>
-                options.UseSqlServer(builder.Configuration.GetConnectionString("AIDataAnalysisConnection"),
+                options.UseSqlServer(builder.Configuration.GetConnectionString("AIDataAnalysisConnection_RemoteConnection"),
                 sqlServerOptionsAction: sqlOptions => 
                 {
                     //sqlOptions.EnableRetryOnFailure(
