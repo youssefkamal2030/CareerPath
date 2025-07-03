@@ -75,7 +75,7 @@ Authorization: Bearer {your_jwt_token}
 | Action                | Method | URL                                 | Body/Params                | Response (200)         |
 |-----------------------|--------|-------------------------------------|----------------------------|------------------------|
 | Save extracted data   | POST   | `/api/ai/extract`                   | `CVAnalysisDto`            | `{ message }`          |
-| Get analysis by email | GET    | `/api/ai/analysis/{email}`          | –                          | `{ ...analysis }`      |
+| Get analysis by User ID (that's encrypted in the Token) | GET    | `/api/ai/analysis`          | –                          | `{ ...analysis }`      |
 
 **CVAnalysisDto Example:**
 ```json
