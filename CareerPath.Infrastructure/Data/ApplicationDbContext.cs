@@ -31,7 +31,8 @@ namespace CareerPath.Infrastructure.Data
             {
                 entity.HasOne(u => u.Profile)
                     .WithOne()
-                    .HasForeignKey<UserProfile>(up => up.Id);
+                    .HasForeignKey<UserProfile>(up => up.Id)
+                    .OnDelete(DeleteBehavior.Cascade);
                 
                 entity.Property(e => e.password).IsRequired(false);
                 entity.Property(e => e.ProfileID).IsRequired(false);

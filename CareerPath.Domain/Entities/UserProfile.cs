@@ -21,8 +21,8 @@ namespace CareerPath.Domain.Entities
 
         public string? AvatarUrl { get; private set; }
         public string? JobTitle { get; private set; }
-        public DateTime CreatedAt { get; private set; } = DateTime.UtcNow;
-        public DateTime UpdatedAt { get; private set; } = DateTime.UtcNow;
+        public DateTime CreatedAt { get;  set; } = DateTime.UtcNow;
+        public DateTime UpdatedAt { get;  set; } = DateTime.UtcNow;
 
         public UserProfile(string id, string firstName, string lastName, string avatarUrl, string username = null, string email = null)
         {
@@ -46,17 +46,17 @@ namespace CareerPath.Domain.Entities
 
         public string FullName => $"{FirstName} {LastName}";
 
-        public void UpdateProfile(string firstName, string lastName, string bio, string location, 
-            string avatarUrl, string coverUrl, string jobTitle, List<string> skills)
+        public void UpdateProfile(string? firstName, string? lastName, string? bio, string? location, 
+            string? avatarUrl, string? coverUrl, string? jobTitle, List<string>? skills)
         {
-            FirstName = firstName;
-            LastName = lastName;
-            Bio = bio;
-            Location = location;
-            AvatarUrl = avatarUrl;
-            CoverUrl = coverUrl;
-            JobTitle = jobTitle;
-            Skills = skills;
+            if (firstName != null) FirstName = firstName;
+            if (lastName != null) LastName = lastName;
+            if (bio != null) Bio = bio;
+            if (location != null) Location = location;
+            if (avatarUrl != null) AvatarUrl = avatarUrl;
+            if (coverUrl != null) CoverUrl = coverUrl;
+            if (jobTitle != null) JobTitle = jobTitle;
+            if (skills != null) Skills = skills;
             UpdatedAt = DateTime.UtcNow;
 
             AddDomainEvent(new UserProfileUpdatedEvent

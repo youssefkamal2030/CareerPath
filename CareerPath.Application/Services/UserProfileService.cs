@@ -75,24 +75,36 @@ namespace CareerPath.Application.Services
 
         public async Task<UserProfileDto> UpdateAsync(string id, UpdateUserProfileDto dto)
         {
-            var userProfile = await _unitOfWork.UserProfiles.GetByIdAsync(id);
-            if (userProfile == null)
+            var user = await _userManager.Users
+                .Include(u => u.Profile)
+                .FirstOrDefaultAsync(u => u.ProfileID == id);
+            if (user == null || user.Profile == null)
                 return null;
 
-            _mapper.Map(dto, userProfile);
-            _unitOfWork.UserProfiles.Update(userProfile);
-            await _unitOfWork.CompleteAsync();
+            user.Profile.UpdateProfile(
+                dto.FirstName,
+                dto.LastName,
+                dto.Bio,
+                dto.Location,
+                dto.AvatarUrl,
+                dto.CoverUrl,
+                dto.JobTitle,
+                dto.Skills ?? new List<string>()
+            );
+            user.Profile.UpdatedAt = DateTime.UtcNow;
 
-            var userProfileDto = _mapper.Map<UserProfileDto>(userProfile);
+            await _userManager.UpdateAsync(user); 
+            await _unitOfWork.CompleteAsync();   
 
-            // Dispatch event
+            var userProfileDto = _mapper.Map<UserProfileDto>(user.Profile);
+
             var userProfileUpdatedEvent = new UserProfileUpdatedEvent
             {
-                UserId = userProfile.Id,
-                FirstName = userProfile.FirstName,
-                LastName = userProfile.LastName,
-                Skills = userProfile.Skills,
-                UpdatedAt = DateTime.UtcNow
+                UserId = user.Profile.Id,
+                FirstName = user.Profile.FirstName,
+                LastName = user.Profile.LastName,
+                Skills = user.Profile.Skills,
+                UpdatedAt = user.Profile.UpdatedAt
             };
             await _mediator.Publish(userProfileUpdatedEvent);
 
@@ -101,13 +113,13 @@ namespace CareerPath.Application.Services
 
         public async Task<bool> DeleteAsync(string id)
         {
-            var userProfile = await _unitOfWork.UserProfiles.GetByIdAsync(id);
-            if (userProfile == null)
+          
+            var user = await _userManager.Users.FirstOrDefaultAsync(u => u.ProfileID == id);
+            if (user == null)
                 return false;
 
-            _unitOfWork.UserProfiles.Remove(userProfile);
-            await _unitOfWork.CompleteAsync();
-            return true;
+            var result = await _userManager.DeleteAsync(user);
+            return result.Succeeded;
         }
     }
 } 
