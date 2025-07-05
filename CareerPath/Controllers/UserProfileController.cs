@@ -20,6 +20,7 @@ namespace CareerPath.Api.Controllers
         }
 
         [HttpGet]
+        [AllowAnonymous]
         public async Task<IActionResult> GetAll()
         {
             var profiles = await _userProfileService.GetAllAsync();
@@ -27,6 +28,7 @@ namespace CareerPath.Api.Controllers
         }
 
         [HttpGet("{id}")]
+        [AllowAnonymous]
         public async Task<IActionResult> GetById(string id)
         {
             var profile = await _userProfileService.GetByIdAsync(id);
