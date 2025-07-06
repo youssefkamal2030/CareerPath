@@ -21,6 +21,11 @@ namespace CareerPath.Domain.Entities
 
         public string? AvatarUrl { get; private set; }
         public string? JobTitle { get; private set; }
+        public string? Phone { get; private set; }
+        public string? City { get; private set; }
+        public string? Country { get; private set; }
+        public DateTime? DateOfBirth { get; private set; }
+        public string? Address { get; private set; }
         public DateTime CreatedAt { get;  set; } = DateTime.UtcNow;
         public DateTime UpdatedAt { get;  set; } = DateTime.UtcNow;
 

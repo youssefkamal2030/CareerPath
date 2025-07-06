@@ -17,12 +17,13 @@ using EmailConfigration.EmailConfig;
 using CareerPath.Application.Configuration;
 using MediatR;
 using Microsoft.AspNetCore.HttpOverrides;
+using CareerPath.Infrastructure.DbInitializer;
 
 namespace CareerPath
 {
     public class Program
     {
-        public static void Main(string[] args)
+        public static async Task Main(string[] args)
         {
             var builder = WebApplication.CreateBuilder(args);
 
@@ -183,8 +184,7 @@ namespace CareerPath
             builder.Services.AddScoped<ICVAnalysisService, CVAnalysisService>();
             builder.Services.AddScoped<ICompanyService, CompanyService>();
             builder.Services.AddScoped<IJobApplicationService, JobApplicationService>();
-
-          
+            builder.Services.AddScoped<Dbinitializer>();
 
             var app = builder.Build();
             if(app.Environment.IsDevelopment())
@@ -197,7 +197,23 @@ namespace CareerPath
                     options.OAuthUsePkce();
                 });
             }
-           
+            using (var scope = app.Services.CreateScope())
+            {
+                var services = scope.ServiceProvider;
+                var logger = services.GetRequiredService<ILogger<Program>>();
+
+                try
+                {
+                    var dbInitializer = services.GetRequiredService<Dbinitializer>();
+                    await dbInitializer.InitializeAsync();
+                    logger.LogInformation("Database initialization completed successfully.");
+                }
+                catch (Exception ex)
+                {
+                    logger.LogError(ex, "Failed to initialize databases during application startup.");
+                
+                }
+            }
 
             app.UseCors("AllowAll");
             

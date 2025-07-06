@@ -32,13 +32,67 @@ namespace CareerPath.Application.Services
         public async Task<UserProfileDto> GetByIdAsync(string id)
         {
             var userProfile = await _unitOfWork.UserProfiles.GetByIdAsync(id);
-            return userProfile != null ? _mapper.Map<UserProfileDto>(userProfile) : null;
+            if (userProfile == null) return null;
+
+            // Fetch AIDataAnalysis personal info and related entities
+            var personalInfo = await _unitOfWork.CVAnalysis.GetCVAnalysisByUserIdAsync(id);
+
+            var dto = _mapper.Map<UserProfileDto>(userProfile);
+            // Map new fields from UserProfile
+            dto.Phone = userProfile.Phone;
+            dto.City = userProfile.City;
+            dto.Country = userProfile.Country;
+            dto.DateOfBirth = userProfile.DateOfBirth;
+            dto.Address = userProfile.Address;
+
+            // Map AIDataAnalysis fields if available
+            if (personalInfo != null)
+            {
+                dto.Phone ??= personalInfo.PersonalInformation?.Phone;
+                dto.Address ??= personalInfo.PersonalInformation?.Address;
+                dto.Educations = personalInfo.Educations;
+                dto.Projects = personalInfo.Projects;
+                dto.WorkExperiences = personalInfo.WorkExperiences;
+            }
+            else
+            {
+                dto.Educations = new List<EducationDto>();
+                dto.Projects = new List<ProjectDto>();
+                dto.WorkExperiences = new List<WorkExperienceDto>();
+            }
+            return dto;
         }
 
         public async Task<IEnumerable<UserProfileDto>> GetAllAsync()
         {
             var userProfiles = await _unitOfWork.UserProfiles.GetAllAsync();
-            return _mapper.Map<IEnumerable<UserProfileDto>>(userProfiles);
+            var result = new List<UserProfileDto>();
+            foreach (var userProfile in userProfiles)
+            {
+                var personalInfo = await _unitOfWork.CVAnalysis.GetCVAnalysisByUserIdAsync(userProfile.Id);
+                var dto = _mapper.Map<UserProfileDto>(userProfile);
+                dto.Phone = userProfile.Phone;
+                dto.City = userProfile.City;
+                dto.Country = userProfile.Country;
+                dto.DateOfBirth = userProfile.DateOfBirth;
+                dto.Address = userProfile.Address;
+                if (personalInfo != null)
+                {
+                    dto.Phone ??= personalInfo.PersonalInformation?.Phone;
+                    dto.Address ??= personalInfo.PersonalInformation?.Address;
+                    dto.Educations = personalInfo.Educations;
+                    dto.Projects = personalInfo.Projects;
+                    dto.WorkExperiences = personalInfo.WorkExperiences;
+                }
+                else
+                {
+                    dto.Educations = new List<EducationDto>();
+                    dto.Projects = new List<ProjectDto>();
+                    dto.WorkExperiences = new List<WorkExperienceDto>();
+                }
+                result.Add(dto);
+            }
+            return result;
         }
 
         public async Task<UserProfileDto> CreateAsync(string userId, CreateUserProfileDto dto)
