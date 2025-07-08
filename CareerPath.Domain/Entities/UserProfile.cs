@@ -14,7 +14,7 @@ namespace CareerPath.Domain.Entities
         public string Username { get; private set; }
         public string Email { get; private set; }
         public string? Bio { get; private set; }
-        public string? Location { get; private set; }
+        public string? Address { get; private set; }
         public string? CoverUrl { get; private set; }
         public string? Experiences { get; private set; } = string.Empty;
         public List<string> Skills { get; private set; } = new List<string>();
@@ -25,7 +25,6 @@ namespace CareerPath.Domain.Entities
         public string? City { get; private set; }
         public string? Country { get; private set; }
         public DateTime? DateOfBirth { get; private set; }
-        public string? Address { get; private set; }
         public DateTime CreatedAt { get;  set; } = DateTime.UtcNow;
         public DateTime UpdatedAt { get;  set; } = DateTime.UtcNow;
 
@@ -51,13 +50,13 @@ namespace CareerPath.Domain.Entities
 
         public string FullName => $"{FirstName} {LastName}";
 
-        public void UpdateProfile(string? firstName, string? lastName, string? bio, string? location, 
+        public void UpdateProfile(string? firstName, string? lastName, string? bio, string? Country, 
             string? avatarUrl, string? coverUrl, string? jobTitle, List<string>? skills)
         {
             if (firstName != null) FirstName = firstName;
             if (lastName != null) LastName = lastName;
             if (bio != null) Bio = bio;
-            if (location != null) Location = location;
+            if (Country != null) Country = Country;
             if (avatarUrl != null) AvatarUrl = avatarUrl;
             if (coverUrl != null) CoverUrl = coverUrl;
             if (jobTitle != null) JobTitle = jobTitle;

@@ -162,7 +162,8 @@ namespace CareerPath
             builder.Services.AddControllers().AddJsonOptions(options => 
             {
                 options.JsonSerializerOptions.ReferenceHandler = null;
-                options.JsonSerializerOptions.DefaultIgnoreCondition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull;
+                options.JsonSerializerOptions.DefaultIgnoreCondition = System.Text.Json.Serialization.JsonIgnoreCondition.Never;
+                options.JsonSerializerOptions.PropertyNamingPolicy = System.Text.Json.JsonNamingPolicy.CamelCase;
             });
 
             // Register UnitOfWork

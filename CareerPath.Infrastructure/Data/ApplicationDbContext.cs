@@ -52,7 +52,7 @@ namespace CareerPath.Infrastructure.Data
                 entity.Property(e => e.Username).IsRequired(false);
                 entity.Property(e => e.Email).IsRequired(false);
                 entity.Property(e => e.Bio).IsRequired(false);
-                entity.Property(e => e.Location).IsRequired(false);
+                entity.Property(e => e.Country).IsRequired(false);
                 entity.Property(e => e.CoverUrl).IsRequired(false);
                 entity.Property(e => e.Experiences).IsRequired(false);
                 entity.Property(e => e.AvatarUrl).IsRequired(false);
