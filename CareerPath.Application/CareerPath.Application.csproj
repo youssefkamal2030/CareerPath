@@ -15,7 +15,7 @@
   <ItemGroup>
     <ProjectReference Include="..\CareerPath.Contracts\CareerPath.Contracts.csproj" />
     <ProjectReference Include="..\CareerPath.Domain\CareerPath.Domain.csproj" />
-    <ProjectReference Include="..\EmailConfigration\EmailConfigration.csproj" />
+    <ProjectReference Include="..\EmailConfigration\Shared.csproj" />
   </ItemGroup>
 
 </Project>

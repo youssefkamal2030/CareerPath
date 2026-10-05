@@ -2,6 +2,7 @@ using AutoMapper;
 using CareerPath.Application.Interfaces;
 using CareerPath.Contracts.Dto;
 using CareerPath.Domain.Entities;
+using CareerPath.Domain.Applications;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;

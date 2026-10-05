@@ -1,5 +1,5 @@
 using CareerPath.Application.Interfaces;
-using CareerPath.Domain.Entities;
+using CareerPath.Domain.Applications;
 using CareerPath.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 using System;

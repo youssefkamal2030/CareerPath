@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 17
-VisualStudioVersion = 17.12.35527.113
+# Visual Studio Version 18
+VisualStudioVersion = 18.9.12120.119 stable
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CareerPath.Api", "CareerPath\CareerPath.Api.csproj", "{34A6E65C-487F-45BC-899C-8D4A1EFAE035}"
 EndProject
@@ -13,7 +13,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CareerPath.Application", "C
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CareerPath.Contracts", "CareerPath.Contracts\CareerPath.Contracts.csproj", "{2AB21989-A7AA-4246-818A-23515173387B}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EmailConfigration", "EmailConfigration\EmailConfigration.csproj", "{FBB0D5B2-A9A4-4428-89CE-BB3DC7B56B6B}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Shared", "EmailConfigration\Shared.csproj", "{FBB0D5B2-A9A4-4428-89CE-BB3DC7B56B6B}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -48,5 +48,8 @@ Global
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {83E30F5A-D69B-41DB-B2BC-4B4AC6B97552}
 	EndGlobalSection
 EndGlobal
