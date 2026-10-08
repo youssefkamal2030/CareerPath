@@ -10,7 +10,6 @@ using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 using System.Web;
 using CareerPath.Domain.Entities;
-using CareerPath.Domain.Identity;
 using EmailConfigration.EmailConfig;
 using Microsoft.Extensions.Logging;
 

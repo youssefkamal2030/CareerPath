@@ -1,10 +1,13 @@
 using System;
-using CareerPath.Domain.Identity;
+using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
+using System.Text.Json.Serialization;
 
-namespace CareerPath.Domain.Recommendations
+namespace CareerPath.Domain.Entities.AIDataAnalysis
 {
     public class Candidate
     {
+        [Key]
         public string Id { get; set; }
         
         public string Location { get; set; }
@@ -29,6 +32,8 @@ namespace CareerPath.Domain.Recommendations
         
         public string? UserId { get; set; }
         
+        [ForeignKey("UserId")]
+        [JsonIgnore]
         public ApplicationUser? User { get; set; }
         public string FullName { get; set; }
     }

@@ -11,9 +11,7 @@ using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Net;
 using System.Text;
-using CareerPath.Domain.ResumeAnalysis;
-using CareerPath.Domain.Recommendations;
-using CareerPath.Domain.Identity;
+using CareerPath.Domain.Entities.AIDataAnalysis;
 using Microsoft.AspNetCore.Http;
 namespace CareerPath.Application.Services
 {

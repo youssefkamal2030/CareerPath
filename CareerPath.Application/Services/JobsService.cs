@@ -4,7 +4,7 @@ using System.Threading.Tasks;
 using AutoMapper;
 using CareerPath.Application.Interfaces;
 using CareerPath.Contracts.Dto;
-using CareerPath.Domain.Recommendations;
+using CareerPath.Domain.Entities.AIDataAnalysis;
 using Microsoft.Extensions.Logging;
 
 namespace CareerPath.Application.Services

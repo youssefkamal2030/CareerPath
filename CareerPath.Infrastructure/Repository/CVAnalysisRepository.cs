@@ -1,8 +1,7 @@
 using AutoMapper;
 using CareerPath.Application.Interfaces;
 using CareerPath.Contracts.Dto;
-using CareerPath.Domain.ResumeAnalysis;
-using CareerPath.Domain.Recommendations;
+using CareerPath.Domain.Entities.AIDataAnalysis;
 using CareerPath.Infrastructure.Data;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;

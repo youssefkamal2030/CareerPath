@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using CareerPath.Domain.Recommendations;
+using CareerPath.Domain.Entities.AIDataAnalysis;
 
 namespace CareerPath.Domain.Entities
 {

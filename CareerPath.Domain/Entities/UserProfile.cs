@@ -3,9 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using CareerPath.Domain.Events;
 
-namespace CareerPath.Domain.Identity
+namespace CareerPath.Domain.Entities
 {
     public class UserProfile : AggregateRoot
     {
