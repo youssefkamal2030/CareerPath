@@ -18,12 +18,8 @@ namespace CareerPath.Domain.Applications
         
         public DateTime? FollowUpReminder { get; set; }
         
-        public virtual Candidate Candidate { get; set; }
-        
-        public virtual Job Job { get; set; }
-        
         public string? UserId { get; set; }
         
-        public ApplicationUser? User { get; set; }
+  
     }
 } 

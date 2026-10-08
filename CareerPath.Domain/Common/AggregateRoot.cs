@@ -1,6 +1,8 @@
 using CareerPath.Domain.Events;
 
-public abstract class AggregateRoot
+namespace CareerPath.Domain.Common;
+
+public abstract class AggregateRoot : Entity
 {
     private readonly List<IDomainEvent> _domainEvents = new();
     

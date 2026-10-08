@@ -15,7 +15,5 @@ namespace CareerPath.Domain.Applications
         public string JobId { get; set; }
         public DateTime DateSaved { get; set; }
 
-        public virtual ApplicationUser User { get; set; }
-        public virtual Job Job { get; set; }
     }
 }
