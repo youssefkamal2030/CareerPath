@@ -1,0 +1,5 @@
+# MarketInsights Module
+
+This module will contain read models and entities related to market insights functionality.
+
+Currently empty - entities will be added in future phases of the modular monolith migration.

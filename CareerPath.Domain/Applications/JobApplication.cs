@@ -1,23 +1,29 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using CareerPath.Domain.Entities.AIDataAnalysis;
+using System;
+using CareerPath.Domain.Recommendations;
+using CareerPath.Domain.Identity;
 
-namespace CareerPath.Domain.Entities
+namespace CareerPath.Domain.Applications
 {
-    public class UserApplication
+    public class JobApplication
     {
         public string ApplicationId { get; set; }
+        
         public string CandidateId { get; set; }
+        
         public string JobId { get; set; }
-        public string JobName { get; set; }
+        
         public DateTime ApplicationDate { get; set; }
+        
         public string ApplicationStatus { get; set; }
+        
         public DateTime? FollowUpReminder { get; set; }
-        // Navigation properties
+        
         public virtual Candidate Candidate { get; set; }
+        
         public virtual Job Job { get; set; }
+        
+        public string? UserId { get; set; }
+        
+        public ApplicationUser? User { get; set; }
     }
-}
+} 

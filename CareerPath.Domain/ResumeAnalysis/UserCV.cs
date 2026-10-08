@@ -1,14 +1,11 @@
 using System;
 using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
-using Microsoft.EntityFrameworkCore.Metadata;
+using CareerPath.Domain.Identity;
 
-namespace CareerPath.Domain.Entities.AIDataAnalysis
+namespace CareerPath.Domain.ResumeAnalysis
 {
     public class UserCV
     {
-        [Key]
         public Guid Id { get; set; }
 
         public string UserId { get; set; }
@@ -20,7 +17,6 @@ namespace CareerPath.Domain.Entities.AIDataAnalysis
         public string ContentType { get; set; }
         public DateTime UploadDate { get; set; }
 
-        [ForeignKey("UserId")]
         public ApplicationUser ApplicationUser { get; set; }
     }
 }

@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using CareerPath.Domain.Entities.AIDataAnalysis;
+using CareerPath.Domain.Recommendations;
 using CareerPath.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;

@@ -20,6 +20,7 @@ namespace CareerPath.Api.Controllers
         }
 
         [HttpGet]
+        [AllowAnonymous] 
         [AllowAnonymous]
         public async Task<IActionResult> GetAll()
         {
@@ -28,6 +29,7 @@ namespace CareerPath.Api.Controllers
         }
 
         [HttpGet("{id}")]
+        [AllowAnonymous] 
         [AllowAnonymous]
         public async Task<IActionResult> GetById(string id)
         {

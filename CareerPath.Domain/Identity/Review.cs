@@ -1,6 +1,7 @@
 using System;
+using CareerPath.Domain.Identity;
 
-namespace CareerPath.Domain.Entities
+namespace CareerPath.Domain.Identity
 {
     public class Review
     {

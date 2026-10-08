@@ -1,14 +1,14 @@
-﻿using CareerPath.Domain.Entities;
+﻿using CareerPath.Domain.Identity;
 using Microsoft.AspNetCore.Identity;
 using System;
-using System.ComponentModel.DataAnnotations.Schema;
 
-public class ApplicationUser : IdentityUser
+namespace CareerPath.Domain.Identity
 {
+    public class ApplicationUser : IdentityUser
+    {
     public string password { get; set; }
     public string? ProfileID { get; set; }
     public DateTime CreatedAt { get; private set; }
-    [ForeignKey("ProfileID")]
     public virtual UserProfile? Profile { get; private set; }
 
     private ApplicationUser() { }
@@ -30,4 +30,5 @@ public class ApplicationUser : IdentityUser
         Profile = profile ?? throw new ArgumentNullException(nameof(profile), "Profile cannot be null.");
         ProfileID = profile.Id;
     }
+}
 }

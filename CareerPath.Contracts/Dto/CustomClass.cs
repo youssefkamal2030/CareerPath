@@ -4,7 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Text.Json.Serialization;
 using System.Threading.Tasks;
-using CareerPath.Domain.Entities.AIDataAnalysis;
+using CareerPath.Domain.ResumeAnalysis;
+using CareerPath.Domain.Recommendations;
+using CareerPath.Domain.Identity;
 
 namespace CareerPath.Contracts.Dto
 {
