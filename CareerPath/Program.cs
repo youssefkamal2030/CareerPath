@@ -17,33 +17,34 @@ using EmailConfigration.EmailConfig;
 using CareerPath.Application.Configuration;
 using MediatR;
 using Microsoft.AspNetCore.HttpOverrides;
+using CareerPath.Infrastructure.DbInitializer;
 
 namespace CareerPath
 {
     public class Program
     {
-        public static void Main(string[] args)
+        public static async Task Main(string[] args)
         {
             var builder = WebApplication.CreateBuilder(args);
 
             builder.Services.AddDbContext<ApplicationDbContext>(options =>
-                options.UseSqlServer(builder.Configuration.GetConnectionString("localConnection"),
+                options.UseSqlServer(builder.Configuration.GetConnectionString("RemoteConnection"),
                 sqlServerOptionsAction: sqlOptions => 
                 {
                     //sqlOptions.EnableRetryOnFailure(
                     //    maxRetryCount: 5,
                     //    maxRetryDelay: TimeSpan.FromSeconds(30),
-                    //    errorNumbersToAdd: null);
+                    //    errorNumbersToAdd: null); ----> commented it because im manging the transactions manually 
                 }));
                 
             builder.Services.AddDbContext<AIDataAnalysisDbContext>(options =>
-                options.UseSqlServer(builder.Configuration.GetConnectionString("AIDataAnalysisConnection"),
+                options.UseSqlServer(builder.Configuration.GetConnectionString("AIDataAnalysisConnection_RemoteConnection"),
                 sqlServerOptionsAction: sqlOptions => 
                 {
-                    sqlOptions.EnableRetryOnFailure(
-                        maxRetryCount: 5,
-                        maxRetryDelay: TimeSpan.FromSeconds(30),
-                        errorNumbersToAdd: null);
+                    //sqlOptions.EnableRetryOnFailure(
+                    //    maxRetryCount: 5,
+                    //    maxRetryDelay: TimeSpan.FromSeconds(30),
+                    //    errorNumbersToAdd: null);----> commented it because im manging the transactions manually 
                 }));
             
             builder.Services.AddDefaultIdentity<ApplicationUser>(options =>
@@ -161,7 +162,8 @@ namespace CareerPath
             builder.Services.AddControllers().AddJsonOptions(options => 
             {
                 options.JsonSerializerOptions.ReferenceHandler = null;
-                options.JsonSerializerOptions.DefaultIgnoreCondition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull;
+                options.JsonSerializerOptions.DefaultIgnoreCondition = System.Text.Json.Serialization.JsonIgnoreCondition.Never;
+                options.JsonSerializerOptions.PropertyNamingPolicy = System.Text.Json.JsonNamingPolicy.CamelCase;
             });
 
             // Register UnitOfWork
@@ -183,8 +185,7 @@ namespace CareerPath
             builder.Services.AddScoped<ICVAnalysisService, CVAnalysisService>();
             builder.Services.AddScoped<ICompanyService, CompanyService>();
             builder.Services.AddScoped<IJobApplicationService, JobApplicationService>();
-
-          
+            builder.Services.AddScoped<Dbinitializer>();
 
             var app = builder.Build();
             if(app.Environment.IsDevelopment())
@@ -197,7 +198,23 @@ namespace CareerPath
                     options.OAuthUsePkce();
                 });
             }
-           
+            using (var scope = app.Services.CreateScope())
+            {
+                var services = scope.ServiceProvider;
+                var logger = services.GetRequiredService<ILogger<Program>>();
+
+                try
+                {
+                    var dbInitializer = services.GetRequiredService<Dbinitializer>();
+                    await dbInitializer.InitializeAsync();
+                    logger.LogInformation("Database initialization completed successfully.");
+                }
+                catch (Exception ex)
+                {
+                    logger.LogError(ex, "Failed to initialize databases during application startup.");
+                
+                }
+            }
 
             app.UseCors("AllowAll");
             

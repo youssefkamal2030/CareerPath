@@ -27,4 +27,8 @@
     <ProjectReference Include="..\CareerPath.Contracts\CareerPath.Contracts.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="DbInitializer\" />
+  </ItemGroup>
+
 </Project>

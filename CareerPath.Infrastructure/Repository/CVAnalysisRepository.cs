@@ -117,6 +117,7 @@ namespace CareerPath.Infrastructure.Repository
             //    return false;
             //}
         }
+        //this method retrives the data for recommending the jobs on the platform
         public async Task<JobRecommendationRequestDto> GetUserDataForRecommendationAsync(string userId)
         {
             var personalinfo = await _context.PersonalInformations
@@ -166,7 +167,7 @@ namespace CareerPath.Infrastructure.Repository
                 Projects = projectDtos,
             };
         }
-     
+     //this method for Recommending the top 5 jobs not related to the data stored 
         public async Task<RecommnderSystemDto> RecommnderSystem(string userId)
         {
             var personalInfo = await _context.PersonalInformations
@@ -221,42 +222,70 @@ namespace CareerPath.Infrastructure.Repository
 
             return (userCV.FileData, userCV.FileName, userCV.ContentType);
         }
-        public async Task<UserCV> SaveUserCV(IFormFile UserCv, string userId)
+        public async Task<UserCV> SaveUserCV(IFormFile userCv, string userId)
         {
+            // Input validation
+            if (userCv == null || userCv.Length == 0)
+                throw new ArgumentException("No file was uploaded or file is empty");
+
+            if (string.IsNullOrWhiteSpace(userId))
+                throw new ArgumentException("User ID cannot be null or empty");
+
+            // File type validation
+            if (!userCv.ContentType.Equals("application/pdf", StringComparison.OrdinalIgnoreCase))
+                throw new ArgumentException("Only PDF files are allowed");
+
+            // File size validation (optional - add if needed)
+            const int maxFileSize = 10 * 1024 * 1024; // 10MB
+            if (userCv.Length > maxFileSize)
+                throw new ArgumentException($"File size exceeds maximum allowed size of {maxFileSize / (1024 * 1024)}MB");
+
             try
             {
-                if (UserCv == null || UserCv.Length == 0)
-                    throw new ArgumentException("No file was uploaded");
+                var existingCv = await _context.userCVs
+                    .FirstOrDefaultAsync(cv => cv.UserId == userId);
 
-                if (!UserCv.ContentType.Equals("application/pdf", StringComparison.OrdinalIgnoreCase))
-                    throw new ArgumentException("File must be a PDF");
-
-                using var memoryStream = new MemoryStream();
-                await UserCv.CopyToAsync(memoryStream);
-                var pdfBytes = memoryStream.ToArray();
-
-                var userCV = new UserCV
+                if (existingCv != null)
                 {
-                    Id = Guid.NewGuid(),
-                    UserId = userId,
-                    FileName = UserCv.FileName,
-                    ContentType = UserCv.ContentType,
-                    FileData = pdfBytes,
-                    UploadDate = DateTime.UtcNow
-                };
+                    using var memoryStream = new MemoryStream();
+                    await userCv.CopyToAsync(memoryStream);
 
-                _context.userCVs.Add(userCV);
-                await _context.SaveChangesAsync();
+                    existingCv.FileName = userCv.FileName;
+                    existingCv.ContentType = userCv.ContentType;
+                    existingCv.FileData = memoryStream.ToArray();
+                    existingCv.UploadDate = DateTime.UtcNow;
 
-                return userCV;
+                    _context.userCVs.Update(existingCv);
+                    await _context.SaveChangesAsync();
+                    return existingCv;
+                }
+                else
+                {
+                    using var memoryStream = new MemoryStream();
+                    await userCv.CopyToAsync(memoryStream);
+
+                    var newUserCV = new UserCV
+                    {
+                        Id = Guid.NewGuid(),
+                        UserId = userId,
+                        FileName = userCv.FileName,
+                        ContentType = userCv.ContentType,
+                        FileData = memoryStream.ToArray(),
+                        UploadDate = DateTime.UtcNow
+                    };
+
+                    _context.userCVs.Add(newUserCV);
+                    await _context.SaveChangesAsync();
+                    return newUserCV;
+                }
             }
-            catch (Exception ex)
+            catch (Exception ex) when (!(ex is ArgumentException))
             {
-                throw new Exception($"Error saving CV: {ex.Message}", ex);
+                throw new Exception($"Database error occurred while saving CV: {ex.Message}", ex);
             }
         }
 
-      
+
     }
 
 }

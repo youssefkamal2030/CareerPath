@@ -20,7 +20,6 @@ namespace CareerPath.Infrastructure.Repository
         public IJobApplicationRepository JobApplications { get; private set; }
         public ICVAnalysisRepository CVAnalysis { get; private set; }
 
-        // AI DB Repositories - these need to be created
         public IBaseRepository<Domain.Entities.AIDataAnalysis.Candidate> AIDataAnalysis_Candidate { get; private set; }
         public IBaseRepository<Domain.Entities.AIDataAnalysis.PersonalInformation> AIDataAnalysis_PersonalInformation { get; private set; }
         public IBaseRepository<Domain.Entities.AIDataAnalysis.Skill> AIDataAnalysis_Skill { get; private set; }
@@ -70,6 +69,15 @@ namespace CareerPath.Infrastructure.Repository
         public async Task<IDbContextTransaction> BeginTransactionAsync(IsolationLevel isolationLevel)
         {
             return await _context.Database.BeginTransactionAsync(isolationLevel, default);
+        }
+        public async Task SetUserId(string id)
+        {
+            var user = new CareerPath.Domain.Entities.AIDataAnalysis.ApplicationUser
+            {
+                Id = id
+            };
+            
+            _aiContext.ApplicationUser.Add(user);
         }
         public void Dispose()
         {

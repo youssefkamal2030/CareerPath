@@ -13,8 +13,7 @@ namespace CareerPath.Infrastructure.Data
         public DbSet<Job> Jobs { get; set; }
         public DbSet<Candidate> Candidates { get; set; }
         public DbSet<UserApplication> Applications { get; set; }
-        
-     
+        public DbSet<CareerPath.Domain.Entities.AIDataAnalysis.ApplicationUser> ApplicationUser { get; set; }
         public DbSet<PersonalInformation> PersonalInformations { get; set; }
         public DbSet<Skill> Skills { get; set; }
         public DbSet<WorkExperience> WorkExperiences { get; set; }
@@ -24,8 +23,6 @@ namespace CareerPath.Infrastructure.Data
         protected override void OnModelCreating(ModelBuilder builder)
         {
             base.OnModelCreating(builder);
-
-            
         }
     }
 } 

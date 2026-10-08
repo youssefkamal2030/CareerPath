@@ -1,167 +1,590 @@
-# Career Path API Documentation
+# CareerPath API Documentation
 
-## Overview
-This document provides comprehensive information about the Career Path API endpoints, their request/response formats, and usage examples.
+## Base URL
+```
+https://careerpath-production.up.railway.app
+```
 
 ## Authentication
-Most API endpoints require authentication. Include a valid JWT token in the Authorization header:
-
+This API uses JWT Bearer token authentication. Include the token in the Authorization header:
 ```
-Authorization: Bearer {your_jwt_token}
+Authorization: Bearer <your-jwt-token>
 ```
 
-## API Endpoints
+## Table of Contents
+- [Authentication Endpoints](#authentication-endpoints)
+- [AI Endpoints](#ai-endpoints)
+- [User Profile Endpoints](#user-profile-endpoints)
+- [Company Endpoints](#company-endpoints)
+- [Job Application Endpoints](#job-application-endpoints)
+- [Data Models](#data-models)
+- [Error Handling](#error-handling)
 
-### Auth
+---
 
-- **POST** `/api/auth/register` — Register a new user
-- **POST** `/api/auth/login` — Login and receive a JWT token
-- **POST** `/api/auth/forgot-password` — Request a password reset email
-- **POST** `/api/auth/reset-password` — Reset password using token
-- **GET** `/api/auth/hello` — api check (no auth required)
+## Authentication Endpoints
 
-### User Profiles
+### Register User
+**POST** `/api/auth/register`
 
-- **GET** `/api/profiles` — Get all user profiles (auth required)
-- **GET** `/api/profiles/{id}` — Get a user profile by ID (auth required)
-- **PUT** `/api/profiles/{id}` — Update a user profile (auth required, only self)
-- **DELETE** `/api/profiles/{id}` — Delete a user profile (auth required, only self)
+Register a new user account.
 
-### Companies
-
-- **GET** `/api/companies` — Get all companies
-- **GET** `/api/companies/{id}` — Get a company by ID
-- **POST** `/api/companies` — Create a new company (not yet implemented)
-- **PUT** `/api/companies/{id}` — Update a company (not yet implemented)
-- **DELETE** `/api/companies/{id}` — Delete a company (not yet implemented)
-- **GET** `/api/companies/{id}/jobs` — Get jobs for a specific company
-
-### Job Applications
-
-- **GET** `/api/jobapplication/{id}` — Get a job application by ID
-- **GET** `/api/jobapplication/user?id={userId}` — Get job applications for a user
-- **GET** `/api/jobapplication/jobs` — Get all job applications
-
-### AI & CV Analysis
-
-- **POST** `/api/ai/extract` — Save extracted CV analysis data
-  - Request body: `CVAnalysisDto`
-- **GET** `/api/ai/analysis/{email}` — Get CV analysis by user email
-- **POST** `/api/ai/recommend/{userId}` — Recommend jobs for a user
-- **POST** `/api/ai/recommenderSystem/{userId}` — Get job recommendations from recommender system
-
-## Example Request/Response Formats
-
-### Auth
-#### Register
-- **POST** `/api/auth/register`
-- Request body:
+**Request Body:**
 ```json
 {
   "email": "user@example.com",
-  "password": "string",
-  "username": "string"
+  "username": "johndoe",
+  "password": "securepassword123"
 }
 ```
-- Success: `200 OK` `{ "Message": "User registered successfully" }`
-- Error: `400 Bad Request` `{ "Error": "..." }`
 
-#### Login
-- **POST** `/api/auth/login`
-- Request body:
+**Response:** `200 OK`
+
+---
+
+### Login
+**POST** `/api/auth/login`
+
+Authenticate user and receive JWT token.
+
+**Request Body:**
 ```json
 {
   "email": "user@example.com",
-  "password": "string"
+  "password": "securepassword123"
 }
 ```
-- Success: `200 OK` `{ "Token": "..." }`
-- Error: `400 Bad Request` `{ "Error": "..." }`
 
-### User Profiles
-#### Get Profile
-- **GET** `/api/profiles/{id}`
-- Success: `200 OK` — User profile object
-- Error: `404 Not Found` `{ "Error": "Profile not found or database error occurred" }`
+**Response:** `200 OK`
 
-#### Update Profile
-- **PUT** `/api/profiles/{id}`
-- Request body: `UpdateUserProfileDto`
-- Success: `200 OK` — Updated profile object
-- Error: `500 Internal Server Error` `{ "Error": "..." }`
+---
 
-#### Delete Profile
-- **DELETE** `/api/profiles/{id}`
-- Success: `204 No Content`
-- Error: `500 Internal Server Error` `{ "Error": "..." }`
+### Forgot Password
+**POST** `/api/auth/forgot-password`
 
-### Companies
-#### Get All Companies
-- **GET** `/api/companies`
-- Success: `200 OK` — Array of companies
+Request password reset email.
 
-#### Get Company by ID
-- **GET** `/api/companies/{id}`
-- Success: `200 OK` — Company object
-- Error: `404 Not Found` `{ "Error": "Company with ID {id} not found" }`
+**Request Body:**
+```json
+{
+  "email": "user@example.com"
+}
+```
 
-#### Create/Update/Delete Company
-- **POST/PUT/DELETE** — Not yet implemented, returns `501 Not Implemented`
+**Response:** `200 OK`
 
-#### Get Company Jobs
-- **GET** `/api/companies/{id}/jobs`
-- Success: `200 OK` — Array of jobs for the company
+---
 
-### Job Applications
-#### Get by ID
-- **GET** `/api/jobapplication/{id}`
-- Success: `200 OK` — Job application object
-- Error: `404 Not Found`
+### Reset Password
+**POST** `/api/auth/reset-password`
 
-#### Get by User
-- **GET** `/api/jobapplication/user?id={userId}`
-- Success: `200 OK` — Array of job applications
+Reset password using token from email.
 
-#### Get All
-- **GET** `/api/jobapplication/jobs`
-- Success: `200 OK` — Array of job applications
+**Request Body:**
+```json
+{
+  "email": "user@example.com",
+  "token": "reset-token-from-email",
+  "newPassword": "newpassword123",
+  "confirmPassword": "newpassword123"
+}
+```
 
-### AI & CV Analysis
-#### Save Extracted Data
-- **POST** `/api/ai/extract`
-- Request body: `CVAnalysisDto`
-- Success: `200 OK` `{ "message": "CV analysis data saved successfully" }`
-- Error: `400 Bad Request` or `500 Internal Server Error`
+**Response:** `200 OK`
 
-#### Get CV Analysis by Email
-- **GET** `/api/ai/analysis/{email}`
-- Success: `200 OK` — CV analysis object
-- Error: `404 Not Found` or `500 Internal Server Error`
+---
 
-#### Recommend Jobs
-- **POST** `/api/ai/recommend/{userId}`
-- Success: `200 OK` — Recommendation response
-- Error: `500 Internal Server Error`
+### Health Check
+**GET** `/api/auth/hello`
 
-#### Recommender System
-- **POST** `/api/ai/recommenderSystem/{userId}`
-- Success: `200 OK` — Recommendation response
-- Error: `500 Internal Server Error`
+Simple health check endpoint.
+
+**Response:** `200 OK`
+
+---
+
+## AI Endpoints
+
+### Extract CV Data
+**POST** `/api/ai/extract`
+
+Extract structured data from CV analysis.
+
+**Request Body:**
+```json
+{
+  "personalInformation": {
+    "name": "John Doe",
+    "email": "john@example.com",
+    "phone": "+1234567890",
+    "address": "123 Main St, City, Country"
+  },
+  "skills": [
+    {
+      "skillName": "JavaScript",
+      "proficiencyLevel": "Advanced"
+    }
+  ],
+  "workExperiences": [
+    {
+      "jobTitle": "Software Developer",
+      "jobLevel": "Senior",
+      "company": "Tech Corp",
+      "startYear": 2020,
+      "startMonth": 1,
+      "endYear": 2023,
+      "endMonth": 12,
+      "jobDescription": "Developed web applications..."
+    }
+  ],
+  "educations": [
+    {
+      "institution": "University of Technology",
+      "degree": "Bachelor of Science",
+      "fieldOfStudy": "Computer Science",
+      "startYear": 2016,
+      "startMonth": 9,
+      "endYear": 2020,
+      "endMonth": 6,
+      "educationLevel": "Bachelor"
+    }
+  ],
+  "projects": [
+    {
+      "projectName": "E-commerce Platform",
+      "startDate": "2022-01-01T00:00:00Z",
+      "endDate": "2022-06-01T00:00:00Z",
+      "url": "https://github.com/user/project",
+      "description": "Built a full-stack e-commerce platform..."
+    }
+  ]
+}
+```
+
+**Response:** `200 OK`
+
+---
+
+### Get Analysis
+**GET** `/api/ai/analysis`
+
+Retrieve AI analysis results.
+
+**Response:** `200 OK`
+
+---
+
+### Upload CV
+**POST** `/api/ai/upload`
+
+Upload CV file for processing.
+
+**Request Body:** `multipart/form-data`
+- `cv`: File (binary)
+
+**Response:** `200 OK`
+
+---
+
+### Download CV
+**GET** `/api/ai/download-cv`
+
+Download processed CV file.
+
+**Response:** `200 OK`
+
+---
+
+### Get Recommendations
+**POST** `/api/ai/recommend/{userId}`
+
+Get job recommendations for a specific user.
+
+**Parameters:**
+- `userId` (path): User ID
+
+**Response:** `200 OK`
+
+---
+
+### Recommender System
+**POST** `/api/ai/recommenderSystem/{userId}`
+
+Advanced recommender system for personalized suggestions.
+
+**Parameters:**
+- `userId` (path): User ID
+
+**Response:** `200 OK`
+
+---
+
+## User Profile Endpoints
+
+### Get All Profiles
+**GET** `/api/profiles`
+
+Retrieve all user profiles.
+
+**Response:** `200 OK`
+
+---
+
+### Get Profile by ID
+**GET** `/api/profiles/{id}`
+
+Retrieve specific user profile.
+
+**Parameters:**
+- `id` (path): User ID
+
+**Response:** `200 OK`
+
+---
+
+### Update Profile
+**PUT** `/api/profiles/{id}`
+
+Update user profile information.
+
+**Parameters:**
+- `id` (path): User ID
+
+**Request Body:**
+```json
+{
+  "firstName": "John",
+  "lastName": "Doe",
+  "bio": "Experienced software developer...",
+  "location": "New York, NY",
+  "avatarUrl": "https://example.com/avatar.jpg",
+  "coverUrl": "https://example.com/cover.jpg",
+  "jobTitle": "Senior Software Developer",
+  "skills": ["JavaScript", "React", "Node.js"]
+}
+```
+
+**Response:** `200 OK`
+
+---
+
+### Delete Profile
+**DELETE** `/api/profiles/{id}`
+
+Delete user profile.
+
+**Parameters:**
+- `id` (path): User ID
+
+**Response:** `200 OK`
+
+---
+
+## Company Endpoints
+
+### Get All Companies
+**GET** `/api/companies`
+
+Retrieve all companies.
+
+**Response:** `200 OK`
+```json
+[
+  {
+    "id": "company-uuid",
+    "name": "Tech Corp",
+    "companyProfile": "Leading technology company...",
+    "location": "San Francisco, CA",
+    "website": "https://techcorp.com",
+    "foundedDate": "2010-01-01T00:00:00Z",
+    "employeeCount": 500,
+    "industry": "Technology",
+    "logoUrl": "https://techcorp.com/logo.png",
+    "contacts": "hr@techcorp.com",
+    "officeLocation": "123 Tech Street, SF, CA",
+    "jobs": []
+  }
+]
+```
+
+---
+
+### Get Company by ID
+**GET** `/api/companies/{id}`
+
+Retrieve specific company details.
+
+**Parameters:**
+- `id` (path): Company ID
+
+**Response:** `200 OK` or `404 Not Found`
+
+---
+
+### Create Company
+**POST** `/api/companies`
+
+Create a new company.
+
+**Request Body:**
+```json
+{
+  "name": "New Tech Company",
+  "companyProfile": "Innovative startup...",
+  "location": "Austin, TX",
+  "website": "https://newtech.com",
+  "foundedDate": "2023-01-01T00:00:00Z",
+  "employeeCount": 50,
+  "industry": "Software",
+  "logoUrl": "https://newtech.com/logo.png",
+  "contacts": "contact@newtech.com",
+  "officeLocation": "456 Innovation Ave, Austin, TX"
+}
+```
+
+**Response:** `201 Created` or `400 Bad Request`
+
+---
+
+### Update Company
+**PUT** `/api/companies/{id}`
+
+Update company information.
+
+**Parameters:**
+- `id` (path): Company ID
+
+**Request Body:** Same as create company (all fields optional)
+
+**Response:** `200 OK`, `400 Bad Request`, or `404 Not Found`
+
+---
+
+### Delete Company
+**DELETE** `/api/companies/{id}`
+
+Delete a company.
+
+**Parameters:**
+- `id` (path): Company ID
+
+**Response:** `204 No Content` or `404 Not Found`
+
+---
+
+### Get Company Jobs
+**GET** `/api/companies/{id}/jobs`
+
+Retrieve all jobs for a specific company.
+
+**Parameters:**
+- `id` (path): Company ID
+
+**Response:** `200 OK` or `404 Not Found`
+```json
+[
+  {
+    "jobId": "job-uuid",
+    "title": "Senior Developer",
+    "jobIndustry": "Technology",
+    "companyName": "Tech Corp",
+    "description": "We are looking for...",
+    "requiredSkills": "JavaScript, React, Node.js",
+    "experienceLevel": "Senior",
+    "educationLevel": "Bachelor",
+    "certificationsRequired": "None",
+    "requiredLanguage": "English",
+    "location": "Remote",
+    "salaryRange": "$80,000 - $120,000",
+    "employmentType": "Full-time",
+    "postingDate": "2023-01-01T00:00:00Z",
+    "applicationDeadline": "2023-02-01T00:00:00Z",
+    "age": null,
+    "gender": null,
+    "nationality": null
+  }
+]
+```
+
+---
+
+## Job Application Endpoints
+
+### Get Application by ID
+**GET** `/api/JobApplication/{id}`
+
+Retrieve specific job application.
+
+**Parameters:**
+- `id` (path): Application ID (integer)
+
+**Response:** `200 OK`
+```json
+{
+  "id": 1,
+  "jobId": "job-uuid",
+  "userId": "user-uuid",
+  "applicationStatus": "Pending",
+  "applicationDate": "2023-01-01T00:00:00Z",
+  "resumeUrl": "https://example.com/resume.pdf",
+  "coverLetterUrl": "https://example.com/cover.pdf"
+}
+```
+
+---
+
+### Get User Applications
+**GET** `/api/JobApplication/user?id={userId}`
+
+Retrieve applications for a specific user.
+
+**Query Parameters:**
+- `id`: User ID
+
+**Response:** `200 OK`
+
+---
+
+### Get All Job Applications
+**GET** `/api/JobApplication/jobs`
+
+Retrieve all job applications.
+
+**Response:** `200 OK`
+
+---
+
+## Data Models
+
+### Personal Information
+```json
+{
+  "name": "string",
+  "email": "string",
+  "phone": "string",
+  "address": "string"
+}
+```
+
+### Skill
+```json
+{
+  "skillName": "string",
+  "proficiencyLevel": "string"
+}
+```
+
+### Work Experience
+```json
+{
+  "jobTitle": "string",
+  "jobLevel": "string",
+  "company": "string",
+  "startYear": "integer",
+  "startMonth": "integer",
+  "endYear": "integer",
+  "endMonth": "integer",
+  "jobDescription": "string"
+}
+```
+
+### Education
+```json
+{
+  "institution": "string",
+  "degree": "string",
+  "fieldOfStudy": "string",
+  "startYear": "integer",
+  "startMonth": "integer",
+  "endYear": "integer",
+  "endMonth": "integer",
+  "educationLevel": "string"
+}
+```
+
+### Project
+```json
+{
+  "projectName": "string",
+  "startDate": "string (ISO 8601)",
+  "endDate": "string (ISO 8601)",
+  "url": "string",
+  "description": "string"
+}
+```
+
+---
 
 ## Error Handling
-All endpoints return appropriate HTTP status codes:
-- `200 OK`: The request was successful
-- `201 Created`: Resource created
-- `204 No Content`: Resource deleted
-- `400 Bad Request`: The request was invalid
-- `401 Unauthorized`: Authentication failure
-- `403 Forbidden`: Not allowed
-- `404 Not Found`: The requested resource was not found
-- `500 Internal Server Error`: An unexpected server error occurred
-- `501 Not Implemented`: Endpoint not implemented
 
-Error responses include a message explaining the issue.
+### Standard Error Response
+```json
+{
+  "type": "string",
+  "title": "string",
+  "status": "integer",
+  "detail": "string",
+  "instance": "string"
+}
+```
 
-## Notes
-- Some endpoints (company create/update/delete) are not yet implemented and will return a 501 status.
-- All endpoints requiring authentication expect a JWT token in the `Authorization` header. 
+### Common Status Codes
+- `200 OK`: Request successful
+- `201 Created`: Resource created successfully
+- `204 No Content`: Request successful, no content to return
+- `400 Bad Request`: Invalid request data
+- `401 Unauthorized`: Missing or invalid authentication
+- `404 Not Found`: Resource not found
+- `500 Internal Server Error`: Server error
+
+---
+
+## Usage Examples
+
+### JavaScript/Fetch Example
+```javascript
+// Login
+const loginResponse = await fetch('https://careerpath-production.up.railway.app/api/auth/login', {
+  method: 'POST',
+  headers: {
+    'Content-Type': 'application/json',
+  },
+  body: JSON.stringify({
+    email: 'user@example.com',
+    password: 'password123'
+  })
+});
+
+// Get companies with authentication
+const companiesResponse = await fetch('https://careerpath-production.up.railway.app/api/companies', {
+  headers: {
+    'Authorization': 'Bearer your-jwt-token-here'
+  }
+});
+const companies = await companiesResponse.json();
+```
+
+### cURL Example
+```bash
+# Login
+curl -X POST https://careerpath-production.up.railway.app/api/auth/login \
+  -H "Content-Type: application/json" \
+  -d '{"email": "user@example.com", "password": "password123"}'
+
+# Get companies
+curl -X GET https://careerpath-production.up.railway.app/api/companies \
+  -H "Authorization: Bearer your-jwt-token-here"
+```
+
+---
+
+## Notes for Frontend Team
+
+1. **Authentication**: Always include the JWT token in the Authorization header for protected endpoints
+2. **Error Handling**: Implement proper error handling for all HTTP status codes
+3. **File Uploads**: Use FormData for file uploads (CV upload endpoint)
+4. **Date Formats**: All dates are in ISO 8601 format
+5. **Content-Type**: Use `application/json` for all JSON requests
+6. **Base URL**: Always use the full base URL for all API calls
+
+For any questions or issues, please contact the backend team.

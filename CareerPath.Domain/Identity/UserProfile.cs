@@ -15,15 +15,19 @@ namespace CareerPath.Domain.Identity
         public string Username { get; private set; }
         public string Email { get; private set; }
         public string? Bio { get; private set; }
-        public string? Location { get; private set; }
+        public string? Address { get; private set; }
         public string? CoverUrl { get; private set; }
         public string? Experiences { get; private set; } = string.Empty;
         public List<string> Skills { get; private set; } = new List<string>();
 
         public string? AvatarUrl { get; private set; }
         public string? JobTitle { get; private set; }
-        public DateTime CreatedAt { get; private set; } = DateTime.UtcNow;
-        public DateTime UpdatedAt { get; private set; } = DateTime.UtcNow;
+        public string? Phone { get; private set; }
+        public string? City { get; private set; }
+        public string? Country { get; private set; }
+        public DateTime? DateOfBirth { get; private set; }
+        public DateTime CreatedAt { get;  set; } = DateTime.UtcNow;
+        public DateTime UpdatedAt { get;  set; } = DateTime.UtcNow;
 
         public UserProfile(string id, string firstName, string lastName, string avatarUrl, string username = null, string email = null)
         {
@@ -47,17 +51,17 @@ namespace CareerPath.Domain.Identity
 
         public string FullName => $"{FirstName} {LastName}";
 
-        public void UpdateProfile(string firstName, string lastName, string bio, string location, 
-            string avatarUrl, string coverUrl, string jobTitle, List<string> skills)
+        public void UpdateProfile(string? firstName, string? lastName, string? bio, string? Country, 
+            string? avatarUrl, string? coverUrl, string? jobTitle, List<string>? skills)
         {
-            FirstName = firstName;
-            LastName = lastName;
-            Bio = bio;
-            Location = location;
-            AvatarUrl = avatarUrl;
-            CoverUrl = coverUrl;
-            JobTitle = jobTitle;
-            Skills = skills;
+            if (firstName != null) FirstName = firstName;
+            if (lastName != null) LastName = lastName;
+            if (bio != null) Bio = bio;
+            if (Country != null) Country = Country;
+            if (avatarUrl != null) AvatarUrl = avatarUrl;
+            if (coverUrl != null) CoverUrl = coverUrl;
+            if (jobTitle != null) JobTitle = jobTitle;
+            if (skills != null) Skills = skills;
             UpdatedAt = DateTime.UtcNow;
 
             AddDomainEvent(new UserProfileUpdatedEvent
