@@ -8,16 +8,9 @@ using Microsoft.Extensions.Logging;
 using CareerPath.Application.Services;
 using CareerPath.Contracts.External.JobBoard;
 using CareerPath.Domain.Recommendations;
-
+using CareerPath.Application.Interfaces;
 namespace CareerPath.Infrastructure.Services
 {
-    public interface IJobBoardService
-    {
-        Task<JobBoardProviderResponse> FetchJobsAsync(string searchQuery, string? location = null, int page = 1, int pageSize = 50);
-        Task<List<Job>> FetchAndIngestJobsAsync(string searchQuery, string? location = null);
-        Task<bool> TestProviderConnection();
-    }
-
     public class JobBoardService : IJobBoardService
     {
         private readonly HttpClient _httpClient;

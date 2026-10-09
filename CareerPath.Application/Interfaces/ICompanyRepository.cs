@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using CareerPath.Domain.Entities;
+using CareerPath.Domain.Recommendations;
 
 namespace CareerPath.Application.Interfaces
 {

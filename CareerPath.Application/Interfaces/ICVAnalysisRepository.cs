@@ -1,5 +1,5 @@
 using CareerPath.Contracts.Dto;
-using CareerPath.Domain.Entities.AIDataAnalysis;
+using CareerPath.Domain.ResumeAnalysis;
 using Microsoft.AspNetCore.Http;
 namespace CareerPath.Application.Interfaces
 {

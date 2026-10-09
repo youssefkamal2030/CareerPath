@@ -1,8 +1,10 @@
-﻿using CareerPath.Domain.Entities.AIDataAnalysis;
+﻿using CareerPath.Domain.Applications;
+using CareerPath.Domain.Identity;
+using CareerPath.Domain.Recommendations;
+using CareerPath.Domain.ResumeAnalysis;
 using System;
 using System.Threading.Tasks;
 using CareerPath.Application.Interfaces;
-using CareerPath.Infrastructure.Repository;
 using Microsoft.EntityFrameworkCore.Storage;
 using System.Data;
 namespace CareerPath.Application.Interfaces
@@ -16,12 +18,12 @@ namespace CareerPath.Application.Interfaces
         IJobApplicationRepository JobApplications { get; }
         ICVAnalysisRepository CVAnalysis { get; }
 
-        IBaseRepository<Candidate> AIDataAnalysis_Candidate { get; }
-        IBaseRepository<PersonalInformation> AIDataAnalysis_PersonalInformation { get; }
-        IBaseRepository<Skill> AIDataAnalysis_Skill { get; }
-        IBaseRepository<WorkExperience> AIDataAnalysis_WorkExperience { get; }
-        IBaseRepository<Education> AIDataAnalysis_Education { get; }
-        IBaseRepository<Project> AIDataAnalysis_Project { get; }
+        IBaseRepository<Candidate> Candidates { get; }
+        IBaseRepository<PersonalInformation> PersonalInformation { get; }
+        IBaseRepository<Skill> Skills { get; }
+        IBaseRepository<WorkExperience> WorkExperience { get; }
+        IBaseRepository<Education> Education { get; }
+        IBaseRepository<Project> Projects { get; }
 
         Task<int> CompleteAsync();
         Task<int> CompleteAsyncAi();

@@ -27,9 +27,7 @@ namespace CareerPath.Domain.Recommendations
         
         // Domain-specific properties
         public JobStatus Status { get; private set; } = JobStatus.Active;
-        public DateTime CreatedAt { get; private set; }
         public DateTime? ExpiredAt { get; private set; }
-        public DateTime LastUpdated { get; private set; }
         public string? UserId { get; set; } // For manual job postings
 
         private Job() { } // For EF Core
@@ -89,7 +87,7 @@ namespace CareerPath.Domain.Recommendations
                 ExternalUrl = externalUrl,
                 Status = JobStatus.Active,
                 CreatedAt = DateTime.UtcNow,
-                LastUpdated = DateTime.UtcNow
+                UpdatedAt = DateTime.UtcNow
             };
 
             // Domain event
@@ -130,7 +128,7 @@ namespace CareerPath.Domain.Recommendations
                 ExternalUrl = string.Empty,
                 Status = JobStatus.Active,
                 CreatedAt = DateTime.UtcNow,
-                LastUpdated = DateTime.UtcNow,
+                UpdatedAt = DateTime.UtcNow,
                 UserId = userId
             };
 
@@ -144,7 +142,7 @@ namespace CareerPath.Domain.Recommendations
                 throw new InvalidOperationException("Cannot mark expired job as filled");
 
             Status = JobStatus.Filled;
-            LastUpdated = DateTime.UtcNow;
+            UpdatedAt = DateTime.UtcNow;
             AddDomainEvent(new JobFilledEvent(JobId));
         }
 
@@ -152,7 +150,7 @@ namespace CareerPath.Domain.Recommendations
         {
             Status = JobStatus.Expired;
             ExpiredAt = DateTime.UtcNow;
-            LastUpdated = DateTime.UtcNow;
+            UpdatedAt = DateTime.UtcNow;
             AddDomainEvent(new JobExpiredEvent(JobId));
         }
 
@@ -162,7 +160,7 @@ namespace CareerPath.Domain.Recommendations
                 throw new InvalidOperationException("Cannot pause expired job");
 
             Status = JobStatus.Paused;
-            LastUpdated = DateTime.UtcNow;
+            UpdatedAt = DateTime.UtcNow;
         }
 
         public void ReactivateJob()
@@ -171,7 +169,7 @@ namespace CareerPath.Domain.Recommendations
                 throw new InvalidOperationException("Cannot reactivate expired job");
 
             Status = JobStatus.Active;
-            LastUpdated = DateTime.UtcNow;
+            UpdatedAt = DateTime.UtcNow;
         }
 
         public void UpdateFromExternalSource(
@@ -188,7 +186,7 @@ namespace CareerPath.Domain.Recommendations
             JobTitle = title?.Trim() ?? JobTitle;
             JobDescription = description?.Trim() ?? JobDescription;
             ApplicationDeadline = applicationDeadline;
-            LastUpdated = DateTime.UtcNow;
+            UpdatedAt = DateTime.UtcNow;
 
             AddDomainEvent(new JobUpdatedEvent(JobId));
         }

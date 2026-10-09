@@ -1,6 +1,6 @@
 using AutoMapper;
 using CareerPath.Contracts.Dto;
-using CareerPath.Domain.Entities.AIDataAnalysis;
+using CareerPath.Domain.Recommendations;
 using System;
 
 namespace CareerPath.Application.Profiles

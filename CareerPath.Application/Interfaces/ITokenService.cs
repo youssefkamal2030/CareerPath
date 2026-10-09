@@ -4,6 +4,7 @@ using System.Linq;
 using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
+using CareerPath.Domain.Identity;
 
 namespace CareerPath.Application.Interfaces
 {

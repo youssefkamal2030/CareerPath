@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using CareerPath.Contracts.Dto;
-using CareerPath.Domain.Entities.AIDataAnalysis;
+using CareerPath.Domain.ResumeAnalysis;
 using Microsoft.AspNetCore.Http;
 
 namespace CareerPath.Application.Interfaces

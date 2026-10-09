@@ -1,4 +1,4 @@
-using CareerPath.Domain.Entities;
+using CareerPath.Domain.Identity;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;

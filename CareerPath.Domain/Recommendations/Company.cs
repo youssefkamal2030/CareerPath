@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using CareerPath.Domain.Recommendations;
 
-namespace CareerPath.Domain.Entities
+namespace CareerPath.Domain.Recommendations
 {
     public class Company
     {
