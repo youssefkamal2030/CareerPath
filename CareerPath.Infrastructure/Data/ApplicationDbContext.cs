@@ -8,6 +8,7 @@ using CareerPath.Domain.Identity;
 using CareerPath.Domain.Applications;
 using CareerPath.Domain.Recommendations;
 using CareerPath.Domain.ResumeAnalysis;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 
@@ -41,6 +42,9 @@ namespace CareerPath.Infrastructure.Data
         {
             base.OnModelCreating(builder);
 
+            // Configure Identity tables to use 'identity' schema
+            ConfigureIdentitySchema(builder);
+
             // Configure Job entity with all nullable properties for external ingestion
             ConfigureJobEntity(builder);
             
@@ -54,6 +58,18 @@ namespace CareerPath.Infrastructure.Data
             ConfigureJobApplication(builder);
             ConfigureCandidate(builder);
             ConfigureSkill(builder);
+        }
+
+        private void ConfigureIdentitySchema(ModelBuilder builder)
+        {
+            // Move all ASP.NET Core Identity tables to 'identity' schema
+            builder.Entity<ApplicationUser>().ToTable("AspNetUsers", "identity");
+            builder.Entity<IdentityRole>().ToTable("AspNetRoles", "identity");
+            builder.Entity<IdentityUserRole<string>>().ToTable("AspNetUserRoles", "identity");
+            builder.Entity<IdentityUserClaim<string>>().ToTable("AspNetUserClaims", "identity");
+            builder.Entity<IdentityUserLogin<string>>().ToTable("AspNetUserLogins", "identity");
+            builder.Entity<IdentityRoleClaim<string>>().ToTable("AspNetRoleClaims", "identity");
+            builder.Entity<IdentityUserToken<string>>().ToTable("AspNetUserTokens", "identity");
         }
 
         private void ConfigureJobEntity(ModelBuilder builder)

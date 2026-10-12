@@ -1,5 +1,6 @@
 using CareerPath.Application.Interfaces;
 using CareerPath.Contracts.Dto;
+using CareerPath.Domain.Identity;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;

@@ -2,7 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using CareerPath.Contracts.Dto;
 using Microsoft.AspNetCore.Identity;
-using CareerPath.Domain.Entities;
+using CareerPath.Domain.Identity;
 using CareerPath.Application.Interfaces;
 using AutoMapper;
 using static System.Net.Http.HttpClient;

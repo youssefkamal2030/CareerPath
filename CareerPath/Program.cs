@@ -1,22 +1,11 @@
 using System;
 using System.Collections.Generic;
-using CareerPath.Application.Interfaces;
 using CareerPath.Application.Profiles;
-using CareerPath.Application.Services;
-using CareerPath.Domain.Entities;
-using CareerPath.Infrastructure.Data;
-using Microsoft.AspNetCore.Identity;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.IdentityModel.Tokens;
-using System.Text;
 using Microsoft.OpenApi.Models;
 using System.Reflection;
-using CareerPath.Infrastructure.Repository;
-using EmailConfigration.EmailConfig;
-using CareerPath.Application.Configuration;
 using MediatR;
 using Microsoft.AspNetCore.HttpOverrides;
+using CareerPath.Infrastructure;
 using CareerPath.Infrastructure.DbInitializer;
 
 namespace CareerPath
@@ -27,66 +16,9 @@ namespace CareerPath
         {
             var builder = WebApplication.CreateBuilder(args);
 
-            builder.Services.AddDbContext<ApplicationDbContext>(options =>
-                options.UseSqlServer(builder.Configuration.GetConnectionString("RemoteConnection"),
-                sqlServerOptionsAction: sqlOptions => 
-                {
-                    //sqlOptions.EnableRetryOnFailure(
-                    //    maxRetryCount: 5,
-                    //    maxRetryDelay: TimeSpan.FromSeconds(30),
-                    //    errorNumbersToAdd: null); ----> commented it because im manging the transactions manually 
-                }));
-                
-            builder.Services.AddDbContext<AIDataAnalysisDbContext>(options =>
-                options.UseSqlServer(builder.Configuration.GetConnectionString("AIDataAnalysisConnection_RemoteConnection"),
-                sqlServerOptionsAction: sqlOptions => 
-                {
-                    //sqlOptions.EnableRetryOnFailure(
-                    //    maxRetryCount: 5,
-                    //    maxRetryDelay: TimeSpan.FromSeconds(30),
-                    //    errorNumbersToAdd: null);----> commented it because im manging the transactions manually 
-                }));
-            
-            builder.Services.AddDefaultIdentity<ApplicationUser>(options =>
-            {
-                options.Password.RequireDigit = true;
-                options.Password.RequireLowercase = true;
-                options.Password.RequireUppercase = false;
-                options.Password.RequireNonAlphanumeric = false;
-                options.Password.RequiredLength = 8;
-                options.Password.RequiredUniqueChars = 0;
-                options.User.RequireUniqueEmail = true;
-            })
-            .AddRoles<IdentityRole>()
-            .AddEntityFrameworkStores<ApplicationDbContext>()
-            .AddDefaultTokenProviders();
-            //  JWT Authentication
-            var jwtSettings = builder.Configuration.GetSection("Jwt");
-            var secretKey = jwtSettings["SecretKey"];
-            var key = GetSecretKeyBytes(secretKey);
-            
-            builder.Services.AddAuthentication(options =>
-            {
-                options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-                options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-                options.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
-            })
-            .AddJwtBearer(options =>
-            {
-                options.RequireHttpsMetadata = false; // Set to true in production
-                options.SaveToken = true;
-                options.TokenValidationParameters = new TokenValidationParameters
-                {
-                    ValidateIssuerSigningKey = true,
-                    IssuerSigningKey = new SymmetricSecurityKey(key),
-                    ValidateIssuer = true,
-                    ValidIssuer = jwtSettings["Issuer"],
-                    ValidateAudience = true,
-                    ValidAudience = jwtSettings["Audience"],
-                    ValidateLifetime = true,
-                    ClockSkew = TimeSpan.Zero
-                };
-            });
+            // Add Infrastructure services
+            builder.Services.AddInfraStructure(builder.Configuration);
+
             //CORS 
             builder.Services.AddCors(options =>
             {
@@ -98,27 +30,12 @@ namespace CareerPath
                               .AllowAnyHeader();
                     });
             });
+
             // AutoMapper
             builder.Services.AddAutoMapper(typeof(UserProfileMapping).Assembly);
-            // Email Config 
-            var emailConfig = new EmailConfigration.EmailConfig.EmailConfigration();
-            builder.Configuration.GetSection("EmailSettings").Bind(emailConfig);
-            builder.Services.AddSingleton(emailConfig);
 
-            // External Services Configuration
-            builder.Services.Configure<ExternalServicesSettings>(
-                builder.Configuration.GetSection("ExternalServices"));
-
-            // Register HttpClient for AI Team API
-            builder.Services.AddHttpClient("AITeamClient", (serviceProvider, client) =>
-            {
-                var settings = builder.Configuration
-                    .GetSection("ExternalServices:AITeamApi")
-                    .Get<AITeamApiSettings>();
-                    
-                client.BaseAddress = new Uri(settings.BaseUrl);
-                client.DefaultRequestHeaders.Add("Accept", "application/json");
-            });
+            // Register MediatR
+            builder.Services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(typeof(Application.Services.UserProfileService).Assembly));
 
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen(options =>
@@ -166,28 +83,8 @@ namespace CareerPath
                 options.JsonSerializerOptions.PropertyNamingPolicy = System.Text.Json.JsonNamingPolicy.CamelCase;
             });
 
-            // Register UnitOfWork
-            builder.Services.AddScoped<Application.Interfaces.IUnitOfWork, UnitOfWork>();
-
-            // Register MediatR
-            builder.Services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(typeof(UserProfileService).Assembly));
-
-            builder.Services.AddScoped<ITokenService, TokenService>();
-            builder.Services.AddScoped<IAuthService, AuthService>();
-
-            //  Application services
-            builder.Services.AddScoped<IUserProfileService, UserProfileService>();
-            builder.Services.AddScoped<IEmailService, SmtpEmailService>();
-            builder.Services.AddScoped<EmailSender>();
-            builder.Services.AddScoped<IJobRepository, JobRepository>();
-            builder.Services.AddScoped<IJobsService, JobsService>();
-            builder.Services.AddScoped<JobNotificationService>();
-            builder.Services.AddScoped<ICVAnalysisService, CVAnalysisService>();
-            builder.Services.AddScoped<ICompanyService, CompanyService>();
-            builder.Services.AddScoped<IJobApplicationService, JobApplicationService>();
-            builder.Services.AddScoped<Dbinitializer>();
-
             var app = builder.Build();
+            
             if(app.Environment.IsDevelopment())
             {
                 app.UseSwagger();
@@ -198,6 +95,7 @@ namespace CareerPath
                     options.OAuthUsePkce();
                 });
             }
+            
             using (var scope = app.Services.CreateScope())
             {
                 var services = scope.ServiceProvider;
@@ -212,34 +110,15 @@ namespace CareerPath
                 catch (Exception ex)
                 {
                     logger.LogError(ex, "Failed to initialize databases during application startup.");
-                
                 }
             }
 
             app.UseCors("AllowAll");
-            
-           
             app.UseAuthentication();
             app.UseAuthorization();
             app.MapControllers();
            
             app.Run();
-            app.Run();
-        }
-
-        private static byte[] GetSecretKeyBytes(string secretKey)
-        {
-           
-            try
-            {
-                return Convert.FromBase64String(secretKey);
-            }
-            catch (FormatException)
-            {
-              
-                string base64Secret = Convert.ToBase64String(Encoding.UTF8.GetBytes(secretKey));
-                return Convert.FromBase64String(base64Secret);
-            }
         }
     }
 }
