@@ -1,5 +1,8 @@
 using System;
-using CareerPath.Domain.Entities.AIDataAnalysis;
+using CareerPath.Domain.Applications;
+using CareerPath.Domain.Identity;
+using CareerPath.Domain.Recommendations;
+using CareerPath.Domain.ResumeAnalysis;
 using Microsoft.EntityFrameworkCore;
 
 namespace CareerPath.Infrastructure.Data
@@ -12,8 +15,8 @@ namespace CareerPath.Infrastructure.Data
 
         public DbSet<Job> Jobs { get; set; }
         public DbSet<Candidate> Candidates { get; set; }
-        public DbSet<UserApplication> Applications { get; set; }
-        public DbSet<CareerPath.Domain.Entities.AIDataAnalysis.ApplicationUser> ApplicationUser { get; set; }
+        public DbSet<JobApplication> Applications { get; set; }
+        public DbSet<ApplicationUser> ApplicationUser { get; set; }
         public DbSet<PersonalInformation> PersonalInformations { get; set; }
         public DbSet<Skill> Skills { get; set; }
         public DbSet<WorkExperience> WorkExperiences { get; set; }

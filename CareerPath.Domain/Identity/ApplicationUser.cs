@@ -29,5 +29,11 @@ namespace CareerPath.Domain.Identity
             Profile = profile ?? throw new ArgumentNullException(nameof(profile), "Profile cannot be null.");
             ProfileID = profile.Id;
         }
+        public void SetId(Guid id)
+        {
+            if (id == Guid.Empty)
+                throw new ArgumentException("Id cannot be empty.", nameof(id));
+            Id = id.ToString();
+        }
     }
 }

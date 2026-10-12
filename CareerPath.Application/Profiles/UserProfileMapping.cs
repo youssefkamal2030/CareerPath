@@ -1,6 +1,6 @@
 ﻿using AutoMapper;
 using CareerPath.Contracts.Dto;
-using CareerPath.Domain.Entities;
+using CareerPath.Domain.Identity;
 using System.Collections.Generic;
 
 namespace CareerPath.Application.Profiles

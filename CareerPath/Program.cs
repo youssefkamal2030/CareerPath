@@ -7,7 +7,8 @@ using MediatR;
 using Microsoft.AspNetCore.HttpOverrides;
 using CareerPath.Infrastructure;
 using CareerPath.Infrastructure.DbInitializer;
-
+// this api should be deleted once i tech the project on my local machine
+// "Jooble_API_Key":"c43b401b-b24d-4068-84a9-be789bc49544"
 namespace CareerPath
 {
     public class Program

@@ -2,8 +2,8 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Configuration;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using System.Text;
 using CareerPath.Infrastructure.Data;
 using CareerPath.Infrastructure.Repository;
@@ -12,6 +12,7 @@ using CareerPath.Infrastructure.DbInitializer;
 using CareerPath.Application.Services;
 using EmailConfigration.EmailConfig;
 using CareerPath.Application.Configuration;
+using CareerPath.Domain.Identity;
 
 namespace CareerPath.Infrastructure;
 
@@ -39,7 +40,7 @@ public static class InfrastructureDIExtensions
                 //    maxRetryDelay: TimeSpan.FromSeconds(30),
                 //    errorNumbersToAdd: null);----> commented it because im manging the transactions manually 
             }));
-            }));
+          
 
         // ASP.NET Core Identity Configuration
         services.AddIdentity<ApplicationUser, IdentityRole>(options =>

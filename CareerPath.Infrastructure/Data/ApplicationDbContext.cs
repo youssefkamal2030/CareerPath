@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using CareerPath.Domain.Entities;
 using CareerPath.Domain.Identity;
 using CareerPath.Domain.Applications;
 using CareerPath.Domain.Recommendations;
@@ -27,7 +26,7 @@ namespace CareerPath.Infrastructure.Data
         
         // Applications Module
         public DbSet<FavoriteJob> FavoriteJobs { get; set; }
-        public DbSet<CareerPath.Domain.Applications.JobApplication> JobApplications { get; set; }
+        public DbSet<JobApplication> JobApplications { get; set; }
         
         // Recommendations Module
         public DbSet<Job> Jobs { get; set; }
@@ -35,8 +34,7 @@ namespace CareerPath.Infrastructure.Data
         public DbSet<Candidate> Candidates { get; set; }
         public DbSet<Skill> Skills { get; set; }
         
-        // Legacy entities (will be moved in future phases)
-        public DbSet<UserApplication> UserApplications { get; set; }
+    
 
         protected override void OnModelCreating(ModelBuilder builder)
         {
@@ -53,7 +51,6 @@ namespace CareerPath.Infrastructure.Data
             ConfigureUserProfile(builder);
             ConfigureCompany(builder);
             ConfigureFavoriteJob(builder);
-            ConfigureUserApplication(builder);
             ConfigureReview(builder);
             ConfigureJobApplication(builder);
             ConfigureCandidate(builder);
@@ -104,7 +101,7 @@ namespace CareerPath.Infrastructure.Data
                     .HasConversion<int>() // Store enum as int
                     .IsRequired();
                 entity.Property(e => e.CreatedAt).IsRequired();
-                entity.Property(e => e.LastUpdated).IsRequired();
+                entity.Property(e => e.UpdatedAt).IsRequired();
                 entity.Property(e => e.ExpiredAt).IsRequired(false);
                 entity.Property(e => e.UserId).IsRequired(false).HasMaxLength(450); // For manual jobs
                 
@@ -205,31 +202,6 @@ namespace CareerPath.Infrastructure.Data
                 entity.Property(e => e.JobId).IsRequired(false);
                 
                 entity.ToTable("FavoriteJobs", "applications");
-            });
-        }
-
-        private void ConfigureUserApplication(ModelBuilder builder)
-        {
-            builder.Entity<UserApplication>(entity =>
-            {
-                entity.HasKey(e => e.ApplicationId);
-                entity.Property(e => e.CandidateId).IsRequired(false);
-                entity.Property(e => e.JobId).IsRequired(false);
-                entity.Property(e => e.JobName).IsRequired(false);
-                entity.Property(e => e.ApplicationStatus).IsRequired(false);
-
-                // Define relationships
-                entity.HasOne(a => a.Candidate)
-                    .WithMany()
-                    .HasForeignKey(a => a.CandidateId)
-                    .OnDelete(DeleteBehavior.Restrict)
-                    .IsRequired(false);
-
-                entity.HasOne(a => a.Job)
-                    .WithMany()
-                    .HasForeignKey(a => a.JobId)
-                    .OnDelete(DeleteBehavior.Restrict)
-                    .IsRequired(false);
             });
         }
 

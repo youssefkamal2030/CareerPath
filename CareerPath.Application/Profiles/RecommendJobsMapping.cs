@@ -1,6 +1,5 @@
 using AutoMapper;
 using CareerPath.Contracts.Dto;
-using CareerPath.Domain.Entities.AIDataAnalysis;
 
 namespace CareerPath.Application.Profiles
 {

@@ -13,17 +13,17 @@ namespace CareerPath.Application.Interfaces
     {
         IUserProfileRepository UserProfiles { get; }
         ICompanyRepository Companies { get; }
-        IJobRepository jobs { get; }
+        IJobRepository Jobs { get; }
 
         IJobApplicationRepository JobApplications { get; }
         ICVAnalysisRepository CVAnalysis { get; }
 
-        IBaseRepository<Candidate> Candidates { get; }
-        IBaseRepository<PersonalInformation> PersonalInformation { get; }
-        IBaseRepository<Skill> Skills { get; }
-        IBaseRepository<WorkExperience> WorkExperience { get; }
-        IBaseRepository<Education> Education { get; }
-        IBaseRepository<Project> Projects { get; }
+        //IBaseRepository<Candidate> Candidates { get; }
+        //IBaseRepository<PersonalInformation> PersonalInformation { get; }
+        //IBaseRepository<Skill> Skills { get; }
+        //IBaseRepository<WorkExperience> WorkExperience { get; }
+        //IBaseRepository<Education> Education { get; }
+        //IBaseRepository<Project> Projects { get; }
 
         Task<int> CompleteAsync();
         Task<int> CompleteAsyncAi();

@@ -1,4 +1,7 @@
 using CareerPath.Application.Interfaces;
+using CareerPath.Domain.Identity;
+using CareerPath.Domain.Recommendations;
+using CareerPath.Domain.ResumeAnalysis;
 using CareerPath.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Storage;
@@ -16,36 +19,32 @@ namespace CareerPath.Infrastructure.Repository
 
         public IUserProfileRepository UserProfiles { get; private set; }
         public ICompanyRepository Companies { get; private set; }
-        public IJobRepository jobs { get; }
+        public IJobRepository Jobs { get; }
         public IJobApplicationRepository JobApplications { get; private set; }
         public ICVAnalysisRepository CVAnalysis { get; private set; }
 
-        public IBaseRepository<Domain.Entities.AIDataAnalysis.Candidate> AIDataAnalysis_Candidate { get; private set; }
-        public IBaseRepository<Domain.Entities.AIDataAnalysis.PersonalInformation> AIDataAnalysis_PersonalInformation { get; private set; }
-        public IBaseRepository<Domain.Entities.AIDataAnalysis.Skill> AIDataAnalysis_Skill { get; private set; }
-        public IBaseRepository<Domain.Entities.AIDataAnalysis.WorkExperience> AIDataAnalysis_WorkExperience { get; private set; }
-        public IBaseRepository<Domain.Entities.AIDataAnalysis.Education> AIDataAnalysis_Education { get; private set; }
-        public IBaseRepository<Domain.Entities.AIDataAnalysis.Project> AIDataAnalysis_Project { get; private set; }
-        public UnitOfWork(ApplicationDbContext context, AIDataAnalysisDbContext aiContext, ILogger<JobRepository> logger)
+        public IBaseRepository<Candidate> AIDataAnalysis_Candidate { get; private set; }
+        public IBaseRepository<PersonalInformation> AIDataAnalysis_PersonalInformation { get; private set; }
+        public IBaseRepository<Skill> AIDataAnalysis_Skill { get; private set; }
+        public IBaseRepository<WorkExperience> AIDataAnalysis_WorkExperience { get; private set; }
+        public IBaseRepository<Education> AIDataAnalysis_Education { get; private set; }
+        public IBaseRepository<Project> AIDataAnalysis_Project { get; private set; }
+        public UnitOfWork(
+     ApplicationDbContext context,
+     AIDataAnalysisDbContext aiContext,
+     IUserProfileRepository userProfiles,
+     ICompanyRepository companies,
+     IJobRepository jobs,
+     IJobApplicationRepository jobApplications,
+     ICVAnalysisRepository cvAnalysis)
         {
             _context = context;
             _aiContext = aiContext;
-            _logger = logger;
-            
-
-            UserProfiles = new UserProfileRepository(_context);
-            Companies = new CompanyRepository(_context);
-            jobs = new JobRepository(_aiContext, _logger);
-            JobApplications = new JobApplicationRepository(_context);
-            CVAnalysis = new CVAnalysisRepository(_aiContext);
-
-            // AI DB Repositories
-            AIDataAnalysis_Candidate = new BaseRepository<Domain.Entities.AIDataAnalysis.Candidate>(_aiContext);
-            AIDataAnalysis_PersonalInformation = new BaseRepository<Domain.Entities.AIDataAnalysis.PersonalInformation>(_aiContext);
-            AIDataAnalysis_Skill = new BaseRepository<Domain.Entities.AIDataAnalysis.Skill>(_aiContext);
-            AIDataAnalysis_WorkExperience = new BaseRepository<Domain.Entities.AIDataAnalysis.WorkExperience>(_aiContext);
-            AIDataAnalysis_Education = new BaseRepository<Domain.Entities.AIDataAnalysis.Education>(_aiContext);
-            AIDataAnalysis_Project = new BaseRepository<Domain.Entities.AIDataAnalysis.Project>(_aiContext);
+            UserProfiles = userProfiles;
+            Companies = companies;
+            Jobs = jobs;
+            JobApplications = jobApplications;
+            CVAnalysis = cvAnalysis;
         }
 
         public async Task<int> CompleteAsync()
@@ -72,12 +71,9 @@ namespace CareerPath.Infrastructure.Repository
         }
         public async Task SetUserId(string id)
         {
-            var user = new CareerPath.Domain.Entities.AIDataAnalysis.ApplicationUser
-            {
-                Id = id
-            };
-            
-            _aiContext.ApplicationUser.Add(user);
+            //ApplicationUser user = await _aiContext.ApplicationUser.FirstOrDefaultAsync(u => u.Id == id);
+            //_aiContext.ApplicationUser.Add(user);
+            throw new NotImplementedException();
         }
         public void Dispose()
         {

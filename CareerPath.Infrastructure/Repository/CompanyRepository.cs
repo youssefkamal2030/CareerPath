@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using CareerPath.Application.Interfaces;
-using CareerPath.Domain.Entities;
+using CareerPath.Domain.Recommendations;
 using CareerPath.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 

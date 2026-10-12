@@ -9,7 +9,6 @@ using CareerPath.Contracts.Dto;
 using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 using System.Web;
-using CareerPath.Domain.Entities;
 using CareerPath.Domain.Identity;
 using EmailConfigration.EmailConfig;
 using Microsoft.Extensions.Logging;
@@ -103,6 +102,7 @@ namespace CareerPath.Application.Services
 
                 var newUser = new ApplicationUser(user.Email, user.Password, user.Username);
                 var result = await _userManager.CreateAsync(newUser, user.Password);
+                //this needs outbox pattern or something to ensure that the user is created in both databases or none at all. For now, we will just commit both transactions if both succeed.
                 await _unitOfWork.SetUserId(newUser.Id);
                 await _unitOfWork.CompleteAsyncAi(); 
 

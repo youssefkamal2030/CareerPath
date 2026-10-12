@@ -27,7 +27,7 @@ namespace CareerPath.Application.Services
         {
             try
             {
-                var jobs = await _unitOfWork.jobs.GetAllAsync();
+                var jobs = await _unitOfWork.Jobs.GetAllAsync();
                 _logger.LogInformation("Retrieved all jobs");
                 return _mapper.Map<IEnumerable<JobDto>>(jobs);
             }
@@ -47,7 +47,7 @@ namespace CareerPath.Application.Services
                     throw new ArgumentException("Job ID cannot be null or empty", nameof(id));
                 }
 
-                var job = await _unitOfWork.jobs.GetByIdAsync(id);
+                var job = await _unitOfWork.Jobs.GetByIdAsync(id);
                 
                 if (job == null)
                 {
@@ -73,7 +73,7 @@ namespace CareerPath.Application.Services
                     throw new ArgumentException("User ID cannot be null or empty", nameof(userId));
                 }
 
-                var jobs = await _unitOfWork.jobs.GetByUserIdAsync(userId);  
+                var jobs = await _unitOfWork.Jobs.GetByUserIdAsync(userId);  
                 _logger.LogInformation("Retrieved jobs for user {UserId}", userId);
                 return _mapper.Map<IEnumerable<JobDto>>(jobs);
             }
