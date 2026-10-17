@@ -1,3 +1,5 @@
+using CareerPath.Domain.Abstractions;
+
 namespace CareerPath.Domain.Events;
 public abstract class DomainEvent : IDomainEvent
 {

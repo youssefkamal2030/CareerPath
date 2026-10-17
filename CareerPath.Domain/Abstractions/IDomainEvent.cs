@@ -1,4 +1,4 @@
-namespace CareerPath.Domain.Events;
+namespace CareerPath.Domain.Abstractions;
 using MediatR;
 
 public interface IDomainEvent : INotification

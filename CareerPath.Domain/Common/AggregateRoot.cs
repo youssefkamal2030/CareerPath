@@ -1,4 +1,4 @@
-using CareerPath.Domain.Events;
+using CareerPath.Domain.Abstractions;
 
 namespace CareerPath.Domain.Common;
 
