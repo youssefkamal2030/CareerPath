@@ -655,3 +655,6 @@ coverage/
 **/appsettings.Development.json
 **/appsettings.local.json
 **/config.local.json
+**/appsettings.json
+#agentic_files
+.kiro/
