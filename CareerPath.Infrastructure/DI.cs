@@ -13,6 +13,7 @@ using CareerPath.Application.Services;
 using EmailConfigration.EmailConfig;
 using CareerPath.Application.Configuration;
 using CareerPath.Domain.Identity;
+using CareerPath.Infrastructure.Configuration;
 
 namespace CareerPath.Infrastructure;
 
@@ -20,9 +21,16 @@ public static class InfrastructureDIExtensions
 {
     public static IServiceCollection AddInfraStructure(this IServiceCollection services, IConfiguration configuration)
     {
+        // Register strongly-typed configuration settings
+        services.AddAppSettingsConfiguration(configuration);
+
+        // Get settings via IOptions pattern
+        var databaseSettings = configuration.GetSection(DatabaseSettings.SectionName).Get<DatabaseSettings>();
+        var jwtSettings = configuration.GetSection(JwtSettings.SectionName).Get<JwtSettings>();
+
         // Database Contexts
         services.AddDbContext<ApplicationDbContext>(options =>
-            options.UseSqlServer(configuration.GetConnectionString("RemoteConnection"),
+            options.UseSqlServer(databaseSettings.RemoteConnection,
             sqlServerOptionsAction: sqlOptions => 
             {
                 //sqlOptions.EnableRetryOnFailure(
@@ -32,7 +40,7 @@ public static class InfrastructureDIExtensions
             }));
             
         services.AddDbContext<AIDataAnalysisDbContext>(options =>
-            options.UseSqlServer(configuration.GetConnectionString("AIDataAnalysisConnection_RemoteConnection"),
+            options.UseSqlServer(databaseSettings.AIDataAnalysisConnection_RemoteConnection,
             sqlServerOptionsAction: sqlOptions => 
             {
                 //sqlOptions.EnableRetryOnFailure(
@@ -84,9 +92,7 @@ public static class InfrastructureDIExtensions
         .AddDefaultTokenProviders();
 
         // JWT Authentication
-        var jwtSettings = configuration.GetSection("Jwt");
-        var secretKey = jwtSettings["SecretKey"];
-        var key = GetSecretKeyBytes(secretKey);
+        var key = GetSecretKeyBytes(jwtSettings.SecretKey);
         
         services.AddAuthentication(options =>
         {
@@ -103,9 +109,9 @@ public static class InfrastructureDIExtensions
                 ValidateIssuerSigningKey = true,
                 IssuerSigningKey = new SymmetricSecurityKey(key),
                 ValidateIssuer = true,
-                ValidIssuer = jwtSettings["Issuer"],
+                ValidIssuer = jwtSettings.Issuer,
                 ValidateAudience = true,
-                ValidAudience = jwtSettings["Audience"],
+                ValidAudience = jwtSettings.Audience,
                 ValidateLifetime = true,
                 ClockSkew = TimeSpan.Zero
             };

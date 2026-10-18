@@ -1,0 +1,31 @@
+{
+    "Logging": {
+        "LogLevel": {
+            "Default": "Information",
+            "Microsoft.AspNetCore": "Warning"
+        }
+    },
+    "AllowedHosts": "*",
+
+    "ConnectionStrings": {
+        "localConnection": "Data Source=(localdb)\\MSSQLLocaldb;Initial Catalog=CareerPath;Integrated Security=True;Trust Server Certificate=True",
+        "AIDataAnalysisConnection": "Data Source=(localdb)\\MSSQLLocaldb;Initial Catalog=AI-DataAnalysis;Integrated Security=True;Trust Server Certificate=True",
+        "RemoteConnection": "Server=YOUR_SERVER; Database=YOUR_DATABASE; User Id=YOUR_USER; Password=YOUR_PASSWORD; Encrypt=True; TrustServerCertificate=True; MultipleActiveResultSets=True;",
+        "AIDataAnalysisConnection_RemoteConnection": "Server=YOUR_SERVER; Database=YOUR_DATABASE; User Id=YOUR_USER; Password=YOUR_PASSWORD; Encrypt=True; TrustServerCertificate=True; MultipleActiveResultSets=True;"
+    },
+    "Jwt": {
+        "SecretKey": "YOUR_JWT_SECRET_KEY_AT_LEAST_32_CHARACTERS_LONG",
+        "Issuer": "CareerPath",
+        "Audience": "CareerPathAPI"
+    },
+    "EmailSettings": {
+        "from": "your-email@example.com",
+        "SmtpServer": "smtp.gmail.com",
+        "Port": 465,
+        "Username": "your-email@example.com",
+        "Password": "YOUR_EMAIL_PASSWORD_OR_APP_PASSWORD"
+    },
+    "Sources": {
+        "Jooble_API_Key": "YOUR_JOOBLE_API_KEY"
+    }
+}

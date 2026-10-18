@@ -7,6 +7,7 @@ using MediatR;
 using Microsoft.AspNetCore.HttpOverrides;
 using CareerPath.Infrastructure;
 using CareerPath.Infrastructure.DbInitializer;
+using CareerPath.Infrastructure.Configuration;
 namespace CareerPath
 {
     public class Program
@@ -102,6 +103,24 @@ namespace CareerPath
 
                 try
                 {
+                    // Validate application configuration
+                    logger.LogInformation("Validating application configuration...");
+                    var settingsProvider = services.GetRequiredService<IAppSettingsProvider>();
+                    var configErrors = settingsProvider.ValidateConfiguration();
+                    
+                    if (configErrors.Any())
+                    {
+                        logger.LogWarning("Configuration validation warnings:");
+                        foreach (var (section, message) in configErrors)
+                        {
+                            logger.LogWarning($"  [{section}] {message}");
+                        }
+                    }
+                    else
+                    {
+                        logger.LogInformation("Configuration validated successfully.");
+                    }
+
                     var dbInitializer = services.GetRequiredService<Dbinitializer>();
                     await dbInitializer.InitializeAsync();
                     logger.LogInformation("Database initialization completed successfully.");

@@ -1,0 +1,328 @@
+// THIS IS AN EXAMPLE FILE - NOT COMPILED
+// Copy patterns from this file into your actual controllers
+
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Options;
+using CareerPath.Infrastructure.Configuration;
+
+namespace CareerPath.Controllers;
+
+/// <summary>
+/// Example 1: Controller using individual IOptions
+/// Best when controller only needs one or two specific configuration sections
+/// </summary>
+[ApiController]
+[Route("api/[controller]")]
+public class ExampleController1 : ControllerBase
+{
+    private readonly JwtSettings _jwtSettings;
+    private readonly ILogger<ExampleController1> _logger;
+
+    public ExampleController1(
+        IOptions<JwtSettings> jwtSettings,
+        ILogger<ExampleController1> logger)
+    {
+        _jwtSettings = jwtSettings.Value;
+        _logger = logger;
+    }
+
+    [HttpGet("jwt-info")]
+    public IActionResult GetJwtInfo()
+    {
+        return Ok(new
+        {
+            issuer = _jwtSettings.Issuer,
+            audience = _jwtSettings.Audience,
+            hasSecretKey = !string.IsNullOrEmpty(_jwtSettings.SecretKey)
+        });
+    }
+}
+
+/// <summary>
+/// Example 2: Controller using IAppSettingsProvider
+/// Best when controller needs access to multiple configuration sections
+/// </summary>
+[ApiController]
+[Route("api/[controller]")]
+public class ExampleController2 : ControllerBase
+{
+    private readonly IAppSettingsProvider _settings;
+    private readonly ILogger<ExampleController2> _logger;
+
+    public ExampleController2(
+        IAppSettingsProvider settings,
+        ILogger<ExampleController2> logger)
+    {
+        _settings = settings;
+        _logger = logger;
+    }
+
+    [HttpGet("config-status")]
+    public IActionResult GetConfigurationStatus()
+    {
+        var errors = _settings.ValidateConfiguration();
+
+        if (errors.Any())
+        {
+            return BadRequest(new
+            {
+                message = "Configuration has errors",
+                errors = errors
+            });
+        }
+
+        return Ok(new
+        {
+            message = "All configuration is valid",
+            database = new
+            {
+                hasLocalConnection = !string.IsNullOrEmpty(_settings.Database.LocalConnection),
+                hasRemoteConnection = !string.IsNullOrEmpty(_settings.Database.RemoteConnection)
+            },
+            jwt = new
+            {
+                issuer = _settings.Jwt.Issuer,
+                audience = _settings.Jwt.Audience
+            },
+            email = new
+            {
+                server = _settings.Email.SmtpServer,
+                port = _settings.Email.Port
+            },
+            externalApis = new
+            {
+                hasJoobleKey = !string.IsNullOrEmpty(_settings.ExternalApis.Jooble_API_Key)
+            }
+        });
+    }
+
+    [HttpGet("database-connection")]
+    public IActionResult GetDatabaseConnection([FromQuery] bool useRemote = true)
+    {
+        var connection = _settings.Database.GetMainConnection(useRemote);
+
+        return Ok(new
+        {
+            connectionType = useRemote ? "Remote" : "Local",
+            hasConnection = !string.IsNullOrEmpty(connection)
+        });
+    }
+}
+
+/// <summary>
+/// Example 3: Service (not controller) using configuration
+/// </summary>
+public class ExampleEmailService
+{
+    private readonly EmailSettings _emailSettings;
+    private readonly ILogger<ExampleEmailService> _logger;
+
+    public ExampleEmailService(
+        IOptions<EmailSettings> emailSettings,
+        ILogger<ExampleEmailService> logger)
+    {
+        _emailSettings = emailSettings.Value;
+        _logger = logger;
+
+        // Validate configuration in constructor
+        if (!_emailSettings.IsValid())
+        {
+            _logger.LogError("Email settings are not properly configured");
+            throw new InvalidOperationException(
+                "Email settings are incomplete. Check SMTP server, port, and credentials.");
+        }
+    }
+
+    public async Task<bool> SendEmailAsync(string to, string subject, string body)
+    {
+        try
+        {
+            using var client = new System.Net.Mail.SmtpClient(_emailSettings.SmtpServer, _emailSettings.Port)
+            {
+                EnableSsl = _emailSettings.EnableSsl,
+                Credentials = new System.Net.NetworkCredential(
+                    _emailSettings.Username,
+                    _emailSettings.Password)
+            };
+
+            var message = new System.Net.Mail.MailMessage(
+                _emailSettings.From,
+                to,
+                subject,
+                body)
+            {
+                IsBodyHtml = true
+            };
+
+            await client.SendMailAsync(message);
+            _logger.LogInformation($"Email sent successfully to {to}");
+            return true;
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, $"Failed to send email to {to}");
+            return false;
+        }
+    }
+}
+
+/// <summary>
+/// Example 4: Service using external API configuration
+/// </summary>
+public class ExampleJoobleService
+{
+    private readonly HttpClient _httpClient;
+    private readonly ExternalApiSettings _apiSettings;
+    private readonly ILogger<ExampleJoobleService> _logger;
+
+    public ExampleJoobleService(
+        HttpClient httpClient,
+        IOptions<ExternalApiSettings> apiSettings,
+        ILogger<ExampleJoobleService> logger)
+    {
+        _httpClient = httpClient;
+        _apiSettings = apiSettings.Value;
+        _logger = logger;
+
+        if (string.IsNullOrWhiteSpace(_apiSettings.Jooble_API_Key))
+        {
+            _logger.LogWarning("Jooble API key is not configured");
+        }
+    }
+
+    public async Task<string> SearchJobsAsync(string keyword, string location)
+    {
+        if (string.IsNullOrWhiteSpace(_apiSettings.Jooble_API_Key))
+        {
+            throw new InvalidOperationException("Jooble API key is not configured");
+        }
+
+        try
+        {
+            _httpClient.DefaultRequestHeaders.Clear();
+            _httpClient.DefaultRequestHeaders.Add("X-API-Key", _apiSettings.Jooble_API_Key);
+
+            var requestBody = new
+            {
+                keywords = keyword,
+                location = location
+            };
+
+            var response = await _httpClient.PostAsJsonAsync("api/search", requestBody);
+            response.EnsureSuccessStatusCode();
+
+            var result = await response.Content.ReadAsStringAsync();
+            _logger.LogInformation($"Jooble search completed for keyword: {keyword}");
+
+            return result;
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, $"Jooble API call failed for keyword: {keyword}");
+            throw;
+        }
+    }
+}
+
+/// <summary>
+/// Example 5: Startup validation service
+/// </summary>
+public class ConfigurationValidationService
+{
+    private readonly IAppSettingsProvider _settings;
+    private readonly ILogger<ConfigurationValidationService> _logger;
+
+    public ConfigurationValidationService(
+        IAppSettingsProvider settings,
+        ILogger<ConfigurationValidationService> logger)
+    {
+        _settings = settings;
+        _logger = logger;
+    }
+
+    public void ValidateAndLog()
+    {
+        _logger.LogInformation("Validating application configuration...");
+
+        var errors = _settings.ValidateConfiguration();
+
+        if (errors.Any())
+        {
+            _logger.LogWarning("Configuration validation found issues:");
+            foreach (var (section, message) in errors)
+            {
+                _logger.LogWarning($"  [{section}] {message}");
+            }
+        }
+        else
+        {
+            _logger.LogInformation("✓ All configuration validated successfully");
+        }
+
+        // Log configuration summary (without sensitive data)
+        LogConfigurationSummary();
+    }
+
+    private void LogConfigurationSummary()
+    {
+        _logger.LogInformation("Configuration Summary:");
+        _logger.LogInformation($"  Database: {(_settings.Database.IsValid() ? "✓ Configured" : "✗ Missing")}");
+        _logger.LogInformation($"  JWT: {(_settings.Jwt.IsValid() ? "✓ Configured" : "✗ Missing")}");
+        _logger.LogInformation($"  Email: {(_settings.Email.IsValid() ? "✓ Configured" : "✗ Missing")}");
+        _logger.LogInformation($"  External APIs: {(_settings.ExternalApis.IsValid() ? "✓ Configured" : "✗ Missing")}");
+    }
+}
+
+/// <summary>
+/// Example 6: Unit test showing how to mock configuration
+/// </summary>
+public class ExampleServiceTests
+{
+    [Fact]
+    public void TestEmailService_WithValidConfiguration()
+    {
+        // Arrange
+        var mockEmailSettings = new Mock<IOptions<EmailSettings>>();
+        mockEmailSettings.Setup(x => x.Value).Returns(new EmailSettings
+        {
+            From = "test@example.com",
+            SmtpServer = "smtp.test.com",
+            Port = 587,
+            Username = "test-user",
+            Password = "test-password",
+            EnableSsl = true
+        });
+
+        var mockLogger = new Mock<ILogger<ExampleEmailService>>();
+        var service = new ExampleEmailService(mockEmailSettings.Object, mockLogger.Object);
+
+        // Act & Assert
+        Assert.NotNull(service);
+        // ... additional test logic
+    }
+
+    [Fact]
+    public void TestService_WithAppSettingsProvider()
+    {
+        // Arrange
+        var mockSettings = new Mock<IAppSettingsProvider>();
+        mockSettings.Setup(x => x.Jwt).Returns(new JwtSettings
+        {
+            SecretKey = "test-secret-key-32-characters-long",
+            Issuer = "TestIssuer",
+            Audience = "TestAudience"
+        });
+        mockSettings.Setup(x => x.Database).Returns(new DatabaseSettings
+        {
+            LocalConnection = "Data Source=test.db"
+        });
+
+        // Act
+        var jwtSecret = mockSettings.Object.Jwt.SecretKey;
+        var dbConnection = mockSettings.Object.Database.LocalConnection;
+
+        // Assert
+        Assert.Equal("test-secret-key-32-characters-long", jwtSecret);
+        Assert.Equal("Data Source=test.db", dbConnection);
+    }
+}

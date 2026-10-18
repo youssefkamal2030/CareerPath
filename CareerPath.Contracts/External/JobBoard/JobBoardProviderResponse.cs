@@ -11,5 +11,11 @@ namespace CareerPath.Contracts.External.JobBoard
         public int TotalCount { get; set; }
         public string Provider { get; set; } = string.Empty;
         public DateTime FetchedAt { get; set; }
+        
+        /// <summary>
+        /// Raw API response object from the external provider (e.g., JoobleApiResponse)
+        /// This is kept for later processing by adapters/mappers
+        /// </summary>
+        public object? RawApiResponse { get; set; }
     }
 }

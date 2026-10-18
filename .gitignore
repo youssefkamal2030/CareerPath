@@ -613,11 +613,7 @@ coverage/
 **/models/pretrained/
 
 # Secrets and credentials
-# Remove or comment out the following line to allow appsettings.json:
-# appsettings.*.json
-
-# Explicitly allow appsettings.json
-!appsettings.json
+# Configuration files with sensitive data are ignored below
 
 # ASP.NET Core User Secrets
 **/secrets.json
@@ -651,10 +647,19 @@ coverage/
 *.db
 *.db3
 
-# Local Configuration
-**/appsettings.Development.json
-**/appsettings.local.json
-**/config.local.json
+# Local Configuration - Sensitive Data (API Keys, Connection Strings)
+# Ignore all appsettings.json files that may contain secrets
 **/appsettings.json
-#agentic_files
+**/appsettings.*.json
+!**/appsettings.Development.json.example
+!**/appsettings.Production.json.example
+**/config.local.json
+
+# SQLite Database files (including WAL and SHM files)
+*.db
+*.db-shm
+*.db-wal
+
+# Kiro AI IDE files
 .kiro/
+**/.kiro/

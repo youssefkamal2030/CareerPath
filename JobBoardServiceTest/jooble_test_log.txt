@@ -1,0 +1,9 @@
+Jooble API Test - FAILED
+========================
+Test Date: 10/18/2026 5:09:27 PM
+Keywords: it
+Location: Bern
+Page: 1
+
+Error: API returned null response
+Check console output for detailed error messages.
