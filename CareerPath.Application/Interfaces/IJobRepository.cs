@@ -8,6 +8,7 @@ namespace CareerPath.Application.Interfaces
     public interface IJobRepository
     {
         Task<Job> CreateJobAsync(Job job);
+        Task<Job> AddAsync(Job job); // Added for direct entity addition
         Task<Job> UpdateJobAsync(Job job);
         Task<bool> DeleteJobAsync(string id);
         Task<Job> GetByIdAsync(string id);

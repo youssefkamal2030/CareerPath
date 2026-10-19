@@ -14,6 +14,7 @@ using EmailConfigration.EmailConfig;
 using CareerPath.Application.Configuration;
 using CareerPath.Domain.Identity;
 using CareerPath.Infrastructure.Configuration;
+using CareerPath.Infrastructure.Mappers;
 
 namespace CareerPath.Infrastructure;
 
@@ -139,6 +140,10 @@ public static class InfrastructureDIExtensions
 
         // Register UnitOfWork
         services.AddScoped<Application.Interfaces.IUnitOfWork, UnitOfWork>();
+
+        // Register Job Source Mappers
+        services.AddScoped<IJobSourceMapper<Contracts.External.Jooble.JoobleJob>, JoobleJobMapper>();
+        services.AddScoped<IJobMapperFactory, JobMapperFactory>();
 
         // Register Infrastructure Services
         services.AddScoped<ITokenService, TokenService>();

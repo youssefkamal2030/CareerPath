@@ -13,6 +13,7 @@ using CareerPath.Contracts.External.Jooble;
 using CareerPath.Domain.Recommendations;
 using CareerPath.Application.Interfaces;
 using CareerPath.Infrastructure.Configuration;
+using CareerPath.Infrastructure.Mappers;
 namespace CareerPath.Infrastructure.Services
 {
     public class JobBoardService : IJobBoardService
@@ -21,6 +22,8 @@ namespace CareerPath.Infrastructure.Services
         private readonly IJobIngestionService _jobIngestionService;
         private readonly ILogger<JobBoardService> _logger;
         private readonly ExternalApiSettings _apiSettings;
+        private readonly IJobMapperFactory _mapperFactory;
+        private readonly IJobRepository _jobRepository;
         private readonly string _joobleBaseUrl;
         private readonly string _apiKey;
         private readonly bool _useRealApi;
@@ -29,12 +32,16 @@ namespace CareerPath.Infrastructure.Services
             HttpClient httpClient, 
             IJobIngestionService jobIngestionService,
             ILogger<JobBoardService> logger,
-            IOptions<ExternalApiSettings> apiSettings)
+            IOptions<ExternalApiSettings> apiSettings,
+            IJobMapperFactory mapperFactory,
+            IJobRepository jobRepository)
         {
             _httpClient = httpClient ?? throw new ArgumentNullException(nameof(httpClient));
             _jobIngestionService = jobIngestionService ?? throw new ArgumentNullException(nameof(jobIngestionService));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
             _apiSettings = apiSettings?.Value ?? throw new ArgumentNullException(nameof(apiSettings));
+            _mapperFactory = mapperFactory ?? throw new ArgumentNullException(nameof(mapperFactory));
+            _jobRepository = jobRepository ?? throw new ArgumentNullException(nameof(jobRepository));
             
             // Get API key from configuration
             _apiKey = _apiSettings.Jooble_API_Key;
@@ -195,51 +202,70 @@ namespace CareerPath.Infrastructure.Services
 
         public async Task<List<Job>> FetchAndIngestJobsAsync(string searchQuery, string? location = null)
         {
-            var response = await FetchJobsAsync(searchQuery, location);
-            
-            if (!response.Success)
-            {
-                _logger.LogWarning("Failed to fetch jobs: {Message}", response.Message);
-                return new List<Job>();
-            }
+            _logger.LogInformation("Starting job fetch and ingest for query: {Query}, location: {Location}", 
+                searchQuery, location);
 
             var ingestedJobs = new List<Job>();
 
-            foreach (var externalJob in response.Jobs)
+            try
             {
-                try
+                // Step 1: Fetch jobs from Jooble API
+                var joobleResponse = await FetchJobsFromJoobleApiAsync(searchQuery, location, 1);
+
+                if (joobleResponse == null || !joobleResponse.Jobs.Any())
                 {
-                    // Check if already exists to avoid duplicates
-                    if (await _jobIngestionService.JobAlreadyExists(externalJob.ExternalId, externalJob.SourceProvider))
+                    _logger.LogWarning("No jobs returned from Jooble API");
+                    return ingestedJobs;
+                }
+
+                _logger.LogInformation("Fetched {Count} jobs from Jooble API. Starting mapping and ingestion...", 
+                    joobleResponse.Jobs.Count);
+
+                // Step 2: Get the Jooble mapper
+                var mapper = _mapperFactory.GetMapper<JoobleJob>("Jooble");
+
+                // Step 3: Map Jooble jobs to our domain Job entities
+                var mappedJobs = mapper.MapToJobs(joobleResponse.Jobs).ToList();
+                _logger.LogInformation("Mapped {Count} jobs successfully", mappedJobs.Count);
+
+                // Step 4: Save to repository (with duplicate check)
+                foreach (var job in mappedJobs)
+                {
+                    try
                     {
-                        _logger.LogDebug("Job {ExternalId} from {Provider} already exists, skipping", 
-                            externalJob.ExternalId, externalJob.SourceProvider);
-                        continue;
+                        // Check if job already exists by ExternalId
+                        var existingJob = await _jobRepository.GetByExternalIdAsync(job.ExternalId, job.SourceProvider);
+                        
+                        if (existingJob != null)
+                        {
+                            _logger.LogDebug("Job {ExternalId} already exists, skipping", job.ExternalId);
+                            continue;
+                        }
+
+                        // Add new job
+                        await _jobRepository.AddAsync(job);
+                        ingestedJobs.Add(job);
+
+                        _logger.LogDebug("Added job {JobId} - {Title} to repository", 
+                            job.JobId, job.JobTitle);
                     }
+                    catch (Exception ex)
+                    {
+                        _logger.LogError(ex, "Failed to save job {ExternalId}: {Title}", 
+                            job.ExternalId, job.JobTitle);
+                    }
+                }
 
-                    var job = await _jobIngestionService.IngestJobFromExternalSource(externalJob);
-                    ingestedJobs.Add(job);
-                    
-                    _logger.LogDebug("Successfully ingested job {JobId} from external source {ExternalId}", 
-                        job.JobId, job.ExternalId);
-                }
-                catch (InvalidOperationException ex)
-                {
-                    _logger.LogWarning("Skipped job {ExternalId}: {Message}", externalJob.ExternalId, ex.Message);
-                    continue;
-                }
-                catch (Exception ex)
-                {
-                    _logger.LogError(ex, "Failed to ingest job {ExternalId} from {Provider}", 
-                        externalJob.ExternalId, externalJob.SourceProvider);
-                    continue;
-                }
+                _logger.LogInformation("Successfully ingested {Count} new jobs out of {Total} fetched", 
+                    ingestedJobs.Count, joobleResponse.Jobs.Count);
+
+                return ingestedJobs;
             }
-
-            _logger.LogInformation("Ingested {Count} jobs out of {Total} fetched", 
-                ingestedJobs.Count, response.Jobs.Count);
-
-            return ingestedJobs;
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error during fetch and ingest process");
+                throw;
+            }
         }
 
         public async Task<bool> TestProviderConnection()

@@ -43,6 +43,28 @@ namespace CareerPath.Infrastructure.Repository
             }
         }
 
+        public async Task<Job> AddAsync(Job job)
+        {
+            try
+            {
+                if (job == null)
+                {
+                    throw new ArgumentNullException(nameof(job));
+                }
+
+                await _context.Jobs.AddAsync(job);
+                await _context.SaveChangesAsync();
+                
+                _logger.LogInformation("Job with ID {JobId} was added successfully", job.JobId);
+                return job;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error occurred while adding a new job");
+                throw;
+            }
+        }
+
         public async Task<Job> UpdateJobAsync(Job job)
         {
             try
