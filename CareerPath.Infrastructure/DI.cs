@@ -153,6 +153,7 @@ public static class InfrastructureDIExtensions
         services.AddScoped<EmailSender>();
         services.AddScoped<IJobRepository, JobRepository>();
         services.AddScoped<IJobsService, JobsService>();
+        services.AddScoped<IJobQueryService, JobQueryService>();
         services.AddScoped<JobNotificationService>();
         services.AddScoped<ICVAnalysisService, CVAnalysisService>();
         services.AddScoped<ICompanyService, CompanyService>();
