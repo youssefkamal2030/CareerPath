@@ -158,6 +158,12 @@ public static class InfrastructureDIExtensions
         services.AddScoped<ICVAnalysisService, CVAnalysisService>();
         services.AddScoped<ICompanyService, CompanyService>();
         services.AddScoped<IJobApplicationService, JobApplicationService>();
+        
+        // Register RAG Pipeline Services
+        services.AddScoped<ICVProcessingService, CVProcessingService>();
+        services.AddScoped<IJobMatchingService, JobMatchingService>();
+        services.AddScoped<IJobRecommendationPipeline, JobRecommendationPipeline>();
+        
         services.AddScoped<Dbinitializer>();
 
         return services;
