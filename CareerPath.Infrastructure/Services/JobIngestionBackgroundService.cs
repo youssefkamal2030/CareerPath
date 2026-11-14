@@ -5,6 +5,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using CareerPath.Application.Services;
+using CareerPath.Application.Interfaces;
 
 namespace CareerPath.Infrastructure.Services
 {

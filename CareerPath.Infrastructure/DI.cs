@@ -15,6 +15,7 @@ using CareerPath.Application.Configuration;
 using CareerPath.Domain.Identity;
 using CareerPath.Infrastructure.Configuration;
 using CareerPath.Infrastructure.Mappers;
+using CareerPath.Infrastructure.Services;
 
 namespace CareerPath.Infrastructure;
 

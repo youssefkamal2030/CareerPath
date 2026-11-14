@@ -8,7 +8,7 @@ using System;
 using Microsoft.Extensions.Logging;
 using System.Collections.Generic;
 using AutoMapper;
-using CareerPath.Domain.Entities;
+using CareerPath.Domain.Recommendations;
 
 namespace CareerPath.Api.Controllers
 {

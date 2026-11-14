@@ -17,16 +17,16 @@ namespace CareerPath.Infrastructure.Repository
             _context = context;
         }
 
-        public async Task<JobApplication> GetByIdAsync(int id)
+        public async Task<JobApplication> GetByIdAsync(string id)
         {
             return await _context.JobApplications
-                .FirstOrDefaultAsync(a => a.Id == id);
+                .FirstOrDefaultAsync(a => a.ApplicationId == id);
         }
 
         public async Task<IEnumerable<JobApplication>> GetByUserIdAsync(string userId)
         {
             return await _context.JobApplications
-                .Where(a => a.userId == userId)
+                .Where(a => a.UserId == userId)
                 .ToListAsync();
         }
 
@@ -37,5 +37,7 @@ namespace CareerPath.Infrastructure.Repository
             return await _context.JobApplications
                 .ToListAsync();
         }
+
+     
     }
 } 
