@@ -126,7 +126,8 @@ namespace CareerPath.Infrastructure.Services
         /// Fetches jobs directly from Jooble API
         /// Returns raw JoobleApiResponse object for later mapping
         /// </summary>
-        private async Task<JoobleApiResponse?> FetchJobsFromJoobleApiAsync(string keywords, string? location, int page)
+        /// [Bug] this method returns 500 response despite working on insomnia and postman, likely due to missing headers or payload issues
+        public async Task<JoobleApiResponse?> FetchJobsFromJoobleApiAsync(string keywords, string? location, int page)
         {
             try
             {

@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using CareerPath.Application.Interfaces;
 using CareerPath.Contracts.Dto;
-using EmailConfigration.EmailConfig;
 using Microsoft.Extensions.Logging;
 
 namespace CareerPath.Application.Services
