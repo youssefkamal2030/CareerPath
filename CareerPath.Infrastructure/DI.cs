@@ -1,4 +1,4 @@
-using Microsoft.Extensions.DependencyInjection;
+﻿using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Configuration;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Identity;
@@ -164,6 +164,11 @@ public static class InfrastructureDIExtensions
         services.AddScoped<ICVProcessingService, CVProcessingService>();
         services.AddScoped<IJobMatchingService, JobMatchingService>();
         services.AddScoped<IJobRecommendationPipeline, JobRecommendationPipeline>();
+
+        // Register Job Board and Job Management Services
+        services.AddHttpClient<IJobBoardService, JobBoardService>();
+        services.AddScoped<IJobIngestionService, JobIngestionService>();
+        services.AddScoped<IJobManagementService, JobManagementService>();
         
         services.AddScoped<Dbinitializer>();
 
