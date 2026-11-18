@@ -16,6 +16,7 @@ using CareerPath.Domain.Identity;
 using CareerPath.Infrastructure.Configuration;
 using CareerPath.Infrastructure.Mappers;
 using CareerPath.Infrastructure.Services;
+using CareerPath.Application.Interfaces.IEmails;
 
 namespace CareerPath.Infrastructure;
 
@@ -150,7 +151,7 @@ public static class InfrastructureDIExtensions
         services.AddScoped<ITokenService, TokenService>();
         services.AddScoped<IAuthService, AuthService>();
         services.AddScoped<IUserProfileService, UserProfileService>();
-        services.AddScoped<IEmailService, SmtpEmailService>();
+        services.AddScoped<IEmailService, EmailService>();
         services.AddScoped<EmailSender>();
         services.AddScoped<IJobRepository, JobRepository>();
         services.AddScoped<IJobsService, JobsService>();

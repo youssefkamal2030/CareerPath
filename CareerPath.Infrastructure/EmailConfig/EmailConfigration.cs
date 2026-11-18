@@ -6,12 +6,18 @@ using System.Threading.Tasks;
 
 namespace EmailConfigration.EmailConfig
 {
-    public class EmailConfigration
+    public class SmtpOptions
     {
-      public string from { get; set; }
-        public string SmtpServer { get; set; }
+        public string Host { get; set; } = string.Empty;
+
         public int Port { get; set; }
-        public string UserName { get; set; }
-        public string Password { get; set; }
+
+        public string UserName { get; set; } = string.Empty;
+
+        public string Password { get; set; } = string.Empty;
+
+        public string FromEmail { get; set; } = string.Empty;
+
+        public string FromName { get; set; } = string.Empty;
     }
 }

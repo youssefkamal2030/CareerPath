@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using CareerPath.Application.Interfaces.IEmails;
 using MimeKit;
 
 namespace EmailConfigration.EmailConfig
