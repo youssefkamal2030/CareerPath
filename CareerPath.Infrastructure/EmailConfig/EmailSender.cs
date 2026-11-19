@@ -2,11 +2,10 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using CareerPath.Application.Interfaces.IEmails;
-using MimeKit;
 
 namespace EmailConfigration.EmailConfig
 {
-    public class EmailSender
+    public class EmailSender : IEmailSender
     {
         private readonly IEmailService _emailService;
 
@@ -18,26 +17,38 @@ namespace EmailConfigration.EmailConfig
         /// <summary>
         /// Send a simple email to a single recipient
         /// </summary>
-        public async Task SendEmailAsync(string to, string subject, string content)
+        public async Task SendEmailAsync(string to, string subject, string content, bool isHtml = true)
         {
-            var toAddresses = new List<MailboxAddress> { new MailboxAddress(to, to) };
-            var message = new Message(toAddresses, subject, content);
-            await _emailService.SendEmailAsync(message);
+            var message = new EmailMessage
+            {
+                To = to,
+                Subject = subject,
+                Body = content,
+                IsHtml = isHtml
+            };
+            
+            await _emailService.SendAsync(message);
         }
 
         /// <summary>
-        /// Send an email to multiple recipients
+        /// Send an email to multiple recipients (sends individual emails to each)
         /// </summary>
-        public async Task SendEmailToMultipleRecipientsAsync(IEnumerable<string> toAddresses, string subject, string content)
+        public async Task SendEmailToMultipleRecipientsAsync(IEnumerable<string> toAddresses, string subject, string content, bool isHtml = true)
         {
-            var mailboxAddresses = new List<MailboxAddress>();
+            var tasks = new List<Task>();
             foreach (var address in toAddresses)
             {
-                mailboxAddresses.Add(new MailboxAddress(address, address));
+                var message = new EmailMessage
+                {
+                    To = address,
+                    Subject = subject,
+                    Body = content,
+                    IsHtml = isHtml
+                };
+                tasks.Add(_emailService.SendAsync(message));
             }
 
-            var message = new Message(mailboxAddresses, subject, content);
-            await _emailService.SendEmailAsync(message);
+            await Task.WhenAll(tasks);
         }
 
         /// <summary>
@@ -59,7 +70,7 @@ namespace EmailConfigration.EmailConfig
                 </html>
             ";
 
-            await SendEmailAsync(to, subject, content);
+            await SendEmailAsync(to, subject, content, isHtml: true);
         }
 
         /// <summary>
@@ -84,7 +95,7 @@ namespace EmailConfigration.EmailConfig
                 </html>
             ";
 
-            await SendEmailToMultipleRecipientsAsync(subscribers, subject, content);
+            await SendEmailToMultipleRecipientsAsync(subscribers, subject, content, isHtml: true);
         }
     }
 } 

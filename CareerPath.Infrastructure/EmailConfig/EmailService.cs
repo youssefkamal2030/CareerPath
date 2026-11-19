@@ -7,12 +7,7 @@ using MailKit.Security;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using MimeKit;
-/*[next-session]
- * you made the message and the email service and installed the library , 
- * next you need to make the smpt server from gmail and get the password and username and put it in the appsettings.json file and then you can use the email service to send emails
- * and then make an html message to send to the client and then you can use the email service to send the email to the client
- * and finally test the api that it's working and the email is sent to the client
- */
+
 namespace EmailConfigration.EmailConfig
 {
     public class EmailService : IEmailService

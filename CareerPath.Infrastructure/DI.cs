@@ -121,9 +121,7 @@ public static class InfrastructureDIExtensions
         });
 
         // Email Configuration 
-        var emailConfig = new EmailConfigration.EmailConfig.EmailConfigration();
-        configuration.GetSection("EmailSettings").Bind(emailConfig);
-        services.AddSingleton(emailConfig);
+        services.Configure<SmtpOptions>(configuration.GetSection("EmailSettings"));
 
         // External Services Configuration
         services.Configure<ExternalServicesSettings>(
@@ -152,7 +150,7 @@ public static class InfrastructureDIExtensions
         services.AddScoped<IAuthService, AuthService>();
         services.AddScoped<IUserProfileService, UserProfileService>();
         services.AddScoped<IEmailService, EmailService>();
-        services.AddScoped<EmailSender>();
+        services.AddScoped<IEmailSender, EmailSender>();
         services.AddScoped<IJobRepository, JobRepository>();
         services.AddScoped<IJobsService, JobsService>();
         services.AddScoped<IJobQueryService, JobQueryService>();

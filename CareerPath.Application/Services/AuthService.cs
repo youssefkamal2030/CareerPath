@@ -10,7 +10,7 @@ using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 using System.Web;
 using CareerPath.Domain.Identity;
-using EmailConfigration.EmailConfig;
+using CareerPath.Application.Interfaces.IEmails;
 using Microsoft.Extensions.Logging;
 
 namespace CareerPath.Application.Services
@@ -20,7 +20,7 @@ namespace CareerPath.Application.Services
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly SignInManager<ApplicationUser> _signInManager;
         private readonly ITokenService _jwtTokenService;
-        private readonly EmailSender _emailSender;
+        private readonly IEmailSender _emailSender;
         private readonly ILogger<AuthService> _logger;
         private readonly IUnitOfWork _unitOfWork;
 
@@ -28,7 +28,7 @@ namespace CareerPath.Application.Services
             UserManager<ApplicationUser> userManager, 
             SignInManager<ApplicationUser> signInManager, 
             ITokenService tokenService,
-            EmailSender emailSender,
+            IEmailSender emailSender,
             ILogger<AuthService> logger,
             IUnitOfWork unitOfWork)
         {

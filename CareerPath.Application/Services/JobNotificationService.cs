@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using CareerPath.Application.Interfaces;
+using CareerPath.Application.Interfaces.IEmails;
 using CareerPath.Contracts.Dto;
 using Microsoft.Extensions.Logging;
 
@@ -9,10 +10,10 @@ namespace CareerPath.Application.Services
 {
     public class JobNotificationService
     {
-        private readonly EmailSender _emailSender;
+        private readonly IEmailSender _emailSender;
         private readonly ILogger<JobNotificationService> _logger;
 
-        public JobNotificationService(EmailSender emailSender, ILogger<JobNotificationService> logger)
+        public JobNotificationService(IEmailSender emailSender, ILogger<JobNotificationService> logger)
         {
             _emailSender = emailSender ?? throw new ArgumentNullException(nameof(emailSender));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
